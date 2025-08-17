@@ -1,0 +1,130 @@
+<section
+  class="relative w-screen min-h-screen text-white flex items-center justify-center overflow-hidden"
+>
+  <!-- Grid Layout -->
+  <div
+    class="relative z-10 grid grid-cols-1 lg:grid-cols-3 w-full min-h-screen max-w-7xl mx-auto px-4 sm:px-6 pt-28 sm:pt-24 md:pt-16 lg:pt-0 pb-8 sm:pb-0"
+  >
+    <!-- Left Section -->
+    <div
+      class="flex items-center justify-center text-center mb-8 lg:mb-0 lg:text-left lg:justify-start"
+    >
+      <div class="space-y-3 sm:space-y-4">
+        <h1
+          class="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-wide leading-tight"
+        >
+          <span
+            class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 animate-pulse"
+          >
+            SOFTWARE
+          </span>
+          <br />
+          <span
+            class="text-gray-100 hover:text-cyan-300 transition-colors duration-500"
+            >DEVELOPER</span
+          >
+        </h1>
+        <!-- Additional subtitle for more impact -->
+        <div class="mt-4 sm:mt-6 lg:mt-8">
+          <p
+            class="text-base sm:text-lg md:text-xl text-gray-400 font-light tracking-wider px-4 sm:px-0"
+          >
+            Building the
+            <span class="text-cyan-400 font-semibold">future</span>, one line at
+            a time
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center Image -->
+    <div class="flex items-center justify-center mb-8 lg:mb-0">
+      <div class="relative group">
+        <!-- Glowing ring effect -->
+        <div
+          class="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 blur-md opacity-75 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"
+        ></div>
+        <div
+          class="absolute inset-2 rounded-full bg-gradient-to-r from-cyan-400/50 via-blue-500/50 to-purple-600/50 blur-lg animate-pulse delay-500"
+        ></div>
+
+        <!-- Image container -->
+        <div class="relative">
+          <img
+            src="assets/your-image.jpg"
+            alt="Your Image"
+            class="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 xl:w-80 xl:h-80 rounded-full object-cover border-4 border-gray-800/50 group-hover:border-cyan-400/50 hover:scale-105 transition-all duration-700 shadow-2xl"
+          />
+
+          <!-- Overlay gradient for depth -->
+          <div
+            class="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-transparent to-cyan-400/10 group-hover:to-cyan-400/20 transition-all duration-500"
+          ></div>
+        </div>
+
+        <!-- Floating particles effect -->
+        <div
+          class="absolute -top-4 -right-4 w-3 h-3 bg-cyan-400 rounded-full animate-ping"
+        ></div>
+        <div
+          class="absolute -bottom-6 -left-6 w-2 h-2 bg-blue-500 rounded-full animate-ping delay-1000"
+        ></div>
+        <div
+          class="absolute top-8 -left-8 w-2 h-2 bg-purple-500 rounded-full animate-ping delay-2000"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Right Section -->
+    <div
+      class="flex items-center justify-center text-center lg:text-right lg:justify-end"
+    >
+      <div class="max-w-md space-y-4 sm:space-y-6 px-4 sm:px-0">
+        <p
+          class="text-base sm:text-lg md:text-xl leading-relaxed text-gray-300 hover:text-gray-200 transition-colors duration-300"
+        >
+          Passionate about building
+          <span class="text-cyan-400 font-semibold">clean</span>,
+          <span class="text-blue-400 font-semibold">modern</span>, and
+          <span class="text-purple-400 font-semibold">scalable</span>
+          applications.
+        </p>
+        <p
+          class="text-sm sm:text-base md:text-lg leading-relaxed text-gray-400"
+        >
+          Experienced in <span class="text-cyan-300">Angular</span>,
+          <span class="text-blue-300">TailwindCSS</span>, and backend
+          technologies. Always learning, always creating.
+        </p>
+
+        <!-- Call to action buttons -->
+        <div
+          class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-end mt-6 sm:mt-8"
+        >
+          <button
+            (click)="scrollTo('projects')"
+            class="px-5 sm:px-6 py-3 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-gray-900 font-semibold rounded-xl hover:from-cyan-300 hover:via-blue-400 hover:to-purple-500 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-cyan-400/25 text-sm sm:text-base"
+          >
+            View My Work
+          </button>
+          <button
+            (click)="scrollTo('contact')"
+            class="px-5 sm:px-6 py-3 border-2 border-cyan-400/50 text-cyan-400 font-semibold rounded-xl hover:bg-cyan-400/10 hover:border-cyan-400 hover:scale-105 transition-all duration-300 backdrop-blur-sm text-sm sm:text-base"
+          >
+            Get In Touch
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom scroll indicator -->
+  <div
+    class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center space-y-2"
+  >
+    <span class="text-gray-500 text-sm tracking-wider">SCROLL DOWN</span>
+    <div
+      class="w-0.5 h-12 bg-gradient-to-b from-cyan-400 to-transparent animate-pulse"
+    ></div>
+  </div>
+</section>
