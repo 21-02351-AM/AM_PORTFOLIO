@@ -11,6 +11,7 @@ import { EducationComponent } from './components/components/education/education.
 import { ProjectsComponent } from './components/components/projects/projects.component';
 import { ContactComponent } from './components/components/contact/contact.component';
 import { FooterComponent } from './components/components/footer/footer.component';
+import { EducExpComponent } from './components/educ-exp/educ-exp.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { FooterComponent } from './components/components/footer/footer.component
     EducationComponent,
     ProjectsComponent,
     ContactComponent,
-    FooterComponent
+    FooterComponent,
+    EducExpComponent
   ],
   imports: [
     BrowserModule,

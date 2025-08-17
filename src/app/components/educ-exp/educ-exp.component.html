@@ -1,0 +1,196 @@
+<section
+  id="educ-exp"
+  class="w-full min-h-screen text-white flex flex-col items-center justify-center px-4 sm:px-6 py-16 sm:py-20 relative"
+>
+  <!-- Content Container -->
+  <div
+    class="max-w-6xl w-full text-center space-y-8 sm:space-y-12 relative z-10"
+  >
+    <!-- Header -->
+    <div class="space-y-4 sm:space-y-6">
+      <h2
+        class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight"
+      >
+        <span
+          class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 animate-pulse"
+        >
+          Journey
+        </span>
+        <span
+          class="text-gray-100 hover:text-cyan-300 transition-colors duration-500"
+        >
+          & Growth
+        </span>
+      </h2>
+
+      <!-- Decorative line -->
+      <div class="flex items-center justify-center space-x-4">
+        <div
+          class="w-12 sm:w-16 h-0.5 bg-gradient-to-r from-transparent to-cyan-400"
+        ></div>
+        <div class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+        <div
+          class="w-12 sm:w-16 h-0.5 bg-gradient-to-l from-transparent to-cyan-400"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Toggle Buttons -->
+    <div class="flex justify-center mb-8 sm:mb-12">
+      <!-- Toggle Container with Background -->
+      <div
+        class="relative bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-2 shadow-2xl"
+      >
+        <!-- Sliding Background -->
+        <div
+          class="absolute top-2 h-12 bg-gradient-to-r from-cyan-400/20 to-blue-500/20 border border-cyan-400/50 rounded-xl transition-all duration-500 ease-out backdrop-blur-sm shadow-lg shadow-cyan-400/25"
+          [style.width.px]="toggleWidth"
+          [style.left.px]="activeTab === 'education' ? 8 : toggleWidth + 16"
+        ></div>
+
+        <!-- Buttons -->
+        <div class="relative flex space-x-2">
+          <button
+            #educationBtn
+            class="px-6 sm:px-8 py-3 rounded-xl font-semibold text-sm sm:text-base transition-all duration-500 relative z-10 min-w-32 sm:min-w-36"
+            [class]="
+              activeTab === 'education'
+                ? 'text-cyan-300 hover:text-cyan-200'
+                : 'text-gray-400 hover:text-gray-300'
+            "
+            (click)="setActiveTab('education')"
+          >
+            <span class="flex items-center justify-center space-x-2">
+              <svg
+                class="w-4 h-4 sm:w-5 sm:h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                />
+              </svg>
+              <span>Education</span>
+            </span>
+          </button>
+
+          <button
+            #experienceBtn
+            class="px-6 sm:px-8 py-3 rounded-xl font-semibold text-sm sm:text-base transition-all duration-500 relative z-10 min-w-32 sm:min-w-36"
+            [class]="
+              activeTab === 'experience'
+                ? 'text-cyan-300 hover:text-cyan-200'
+                : 'text-gray-400 hover:text-gray-300'
+            "
+            (click)="setActiveTab('experience')"
+          >
+            <span class="flex items-center justify-center space-x-2">
+              <svg
+                class="w-4 h-4 sm:w-5 sm:h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0H8m8 0v2a2 2 0 002 2M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M8 6H6a2 2 0 00-2 2v6a2 2 0 002 2h2m8-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2m-8 4h8a2 2 0 002-2v-6a2 2 0 00-2-2H8a2 2 0 00-2 2v6a2 2 0 002 2z"
+                />
+              </svg>
+              <span>Experience</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Area with Smooth Transitions -->
+    <div class="relative">
+      <!-- Transition Container -->
+      <div class="relative overflow-hidden">
+        <!-- Education Content -->
+        <div
+          class="transition-all duration-700 ease-in-out"
+          [class]="
+            activeTab === 'education'
+              ? 'opacity-100 translate-x-0 relative'
+              : 'opacity-0 translate-x-full absolute inset-0 pointer-events-none'
+          "
+        >
+          <div
+            class="bg-gray-900/30 backdrop-blur-sm border border-gray-700/30 rounded-2xl p-6 sm:p-8 shadow-2xl"
+          >
+            <!-- Education Component Placeholder -->
+            <div class="text-center space-y-6">
+              <div class="flex items-center justify-center space-x-3 mb-6">
+                <div
+                  class="w-3 h-3 bg-cyan-400 rounded-full animate-pulse"
+                ></div>
+                <h3 class="text-xl sm:text-2xl font-semibold text-cyan-300">
+                  My Educational Background
+                </h3>
+                <div
+                  class="w-3 h-3 bg-blue-400 rounded-full animate-pulse delay-100"
+                ></div>
+              </div>
+
+              <!-- This is where your app-education component goes -->
+              <app-education></app-education>
+            </div>
+          </div>
+        </div>
+
+        <!-- Experience Content -->
+        <div
+          class="transition-all duration-700 ease-in-out"
+          [class]="
+            activeTab === 'experience'
+              ? 'opacity-100 translate-x-0 relative'
+              : 'opacity-0 -translate-x-full absolute inset-0 pointer-events-none'
+          "
+        >
+          <div
+            class="bg-gray-900/30 backdrop-blur-sm border border-gray-700/30 rounded-2xl p-6 sm:p-8 shadow-2xl"
+          >
+            <!-- Experience Component Placeholder -->
+            <div class="text-center space-y-6">
+              <div class="flex items-center justify-center space-x-3 mb-6">
+                <div
+                  class="w-3 h-3 bg-purple-400 rounded-full animate-pulse delay-200"
+                ></div>
+                <h3 class="text-xl sm:text-2xl font-semibold text-purple-300">
+                  My Professional Experience
+                </h3>
+                <div
+                  class="w-3 h-3 bg-cyan-400 rounded-full animate-pulse delay-300"
+                ></div>
+              </div>
+
+              <!-- This is where your app-experience component goes -->
+              <app-experience></app-experience>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating decorative elements -->
+  <div
+    class="absolute top-1/4 left-8 w-2 h-2 bg-cyan-400/60 rounded-full animate-pulse"
+  ></div>
+  <div
+    class="absolute top-3/4 right-8 w-3 h-3 border border-blue-400/40 rotate-45 animate-pulse delay-1000"
+  ></div>
+  <div
+    class="absolute bottom-1/4 left-1/4 w-1.5 h-1.5 bg-purple-500/50 rounded-full animate-ping delay-2000"
+  ></div>
+  <div
+    class="absolute top-1/2 right-1/4 w-1 h-1 bg-cyan-500/40 rounded-full animate-pulse delay-1500"
+  ></div>
+</section>

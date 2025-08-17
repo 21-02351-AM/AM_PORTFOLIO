@@ -1,0 +1,16 @@
+/* Any component-specific styles that aren't in Tailwind */
+.custom-glow {
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
+}
+
+/* Custom animations if needed */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
