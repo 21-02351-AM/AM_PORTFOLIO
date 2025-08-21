@@ -1,9 +1,3 @@
-<!-- <div
-  class="bg-red-500 w-screen h-screen flex items-center justify-center text-white text-4xl"
->
-  Hello Tailwind!
-</div> -->
-
 <!-- Global Animated Background -->
 <div class="fixed inset-0 -z-10 overflow-hidden">
   <!-- Base gradients -->
@@ -68,11 +62,14 @@
   <app-projects></app-projects>
 </section>
 
+<!-- Modified contact section for better responsiveness -->
 <section
   id="contact"
-  class="min-h-screen flex items-center justify-center scroll-mt-20"
+  class="min-h-screen flex items-center scroll-mt-20 w-full"
 >
-  <app-contact></app-contact>
+  <div class="w-full">
+    <app-contact></app-contact>
+  </div>
 </section>
 
 <app-footer></app-footer>

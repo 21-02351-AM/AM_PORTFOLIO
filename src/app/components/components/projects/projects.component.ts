@@ -1,11 +1,576 @@
-import { Component } from '@angular/core';
+// projects.component.ts
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
+
+// Add this type definition at the top
+type ScreenSize = 'mobile' | 'tablet' | 'desktop';
+
+interface Project {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  emoji: string;
+  techStack: TechTag[];
+  buttons: ProjectButton[];
+  stats: ProjectStats;
+  year: string;
+  gradients: ProjectGradients;
+  borderColors: string[];
+  backgroundImage?: string; // Added for dynamic backgrounds
+  liveUrl?: string; // Added for actual navigation
+  githubUrl?: string; // Added for actual navigation
+}
+
+interface TechTag {
+  name: string;
+  gradient: string;
+  borderColor: string;
+  textColor: string;
+  hoverGradient: string;
+}
+
+interface ProjectButton {
+  text: string;
+  bgColor: string;
+  borderColor: string;
+  textColor: string;
+  hoverBgColor: string;
+}
+
+interface ProjectStats {
+  icon: string;
+  label: string;
+  color: string;
+}
+
+interface ProjectGradients {
+  card: string;
+  title: string;
+  titleHover: string;
+  image: string;
+}
 
 @Component({
   selector: 'app-projects',
   standalone: false,
   templateUrl: './projects.component.html',
-  styleUrl: './projects.component.css'
+  styleUrl: './projects.component.css',
 })
-export class ProjectsComponent {
+export class ProjectsComponent implements OnInit, OnDestroy {
+  // Carousel Properties
+  currentIndex = 0;
+  slideWidth = 100; // Base width percentage for single slide
+  maxIndex = 0;
+  autoSlideInterval?: ReturnType<typeof setInterval>;
+  autoSlideDelay = 5000; // 5 seconds
+  slidesToShow = 1; // Number of slides visible at once
 
+  // Add this property to track screen size
+  private currentScreenSize: ScreenSize = 'mobile';
+
+  // Add touch/swipe properties
+  private touchStartX = 0;
+  private touchEndX = 0;
+  private swipeThreshold = 50;
+  private isSwipeEnabled = true;
+
+  // Background images for dynamic section backgrounds
+  backgroundImages = [
+    'linear-gradient(135deg, #0f1419 0%, #1a1d3a 30%, #0f172a 60%, #0d1117 100%)',
+    'linear-gradient(135deg, #1a1d3a 0%, #2d1b69 30%, #1e293b 60%, #0f1419 100%)',
+    'linear-gradient(135deg, #0f172a 0%, #1a365d 30%, #1e293b 60%, #0f1419 100%)',
+    'linear-gradient(135deg, #2d1b69 0%, #7c3aed 30%, #1e293b 60%, #0f1419 100%)',
+    'linear-gradient(135deg, #1a365d 0%, #0891b2 30%, #1e293b 60%, #0f1419 100%)',
+  ];
+
+  // Featured Projects Data
+  featuredProjects: Project[] = [
+    {
+      id: 1,
+      title: 'Portfolio Website',
+      description:
+        'A responsive portfolio showcase featuring <span class="text-blue-300 font-medium">dark neon aesthetics</span>, <span class="text-purple-300 font-medium">smooth animations</span>, and <span class="text-cyan-300 font-medium">modern UI/UX</span> design.',
+      image:
+        'https://i.pinimg.com/736x/7a/aa/0d/7aaa0d087145bfa953daa8e1270137ad.jpg',
+      emoji: '🎨',
+      year: '2024',
+      backgroundImage:
+        'linear-gradient(135deg, #0f1419 0%, #1a1d3a 30%, #0f172a 60%, #0d1117 100%)',
+      liveUrl: 'https://your-portfolio.com',
+      githubUrl: 'https://github.com/yourusername/portfolio',
+      techStack: [
+        {
+          name: 'Angular',
+          gradient: 'from-blue-400/10 to-purple-500/10',
+          borderColor: 'border-blue-400/30',
+          textColor: 'text-blue-300',
+          hoverGradient: 'hover:from-blue-400/20 hover:to-purple-500/20',
+        },
+        {
+          name: 'Tailwind CSS',
+          gradient: 'from-purple-400/10 to-cyan-500/10',
+          borderColor: 'border-purple-400/30',
+          textColor: 'text-purple-300',
+          hoverGradient: 'hover:from-purple-400/20 hover:to-cyan-500/20',
+        },
+        {
+          name: 'GSAP',
+          gradient: 'from-cyan-400/10 to-blue-500/10',
+          borderColor: 'border-cyan-400/30',
+          textColor: 'text-cyan-300',
+          hoverGradient: 'hover:from-cyan-400/20 hover:to-blue-500/20',
+        },
+      ],
+      buttons: [
+        {
+          text: 'Live Demo',
+          bgColor: 'bg-blue-500/20',
+          borderColor: 'border-blue-400/30',
+          textColor: 'text-blue-300',
+          hoverBgColor: 'hover:bg-blue-500/30',
+        },
+        {
+          text: 'Source Code',
+          bgColor: 'bg-purple-500/20',
+          borderColor: 'border-purple-400/30',
+          textColor: 'text-purple-300',
+          hoverBgColor: 'hover:bg-purple-500/30',
+        },
+      ],
+      stats: {
+        icon: 'M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z',
+        label: 'Personal Project',
+        color: 'text-blue-300',
+      },
+      gradients: {
+        card: 'from-blue-600/5 via-purple-400/5 to-cyan-500/5',
+        title: 'from-blue-400 to-purple-500',
+        titleHover: 'hover:from-blue-300 hover:to-purple-400',
+        image: 'from-blue-500/20 via-purple-600/20 to-cyan-500/20',
+      },
+      borderColors: [
+        'border-blue-400',
+        'border-purple-400',
+        'border-cyan-400',
+        'border-blue-400',
+      ],
+    },
+    {
+      id: 2,
+      title: 'Task Management App',
+      description:
+        'A collaborative productivity app with <span class="text-purple-300 font-medium">real-time sync</span>, <span class="text-cyan-300 font-medium">team collaboration</span>, and <span class="text-blue-300 font-medium">advanced analytics</span> dashboard.',
+      image:
+        'https://i.pinimg.com/736x/7a/aa/0d/7aaa0d087145bfa953daa8e1270137ad.jpg',
+      emoji: '📱',
+      year: '2024',
+      backgroundImage:
+        'linear-gradient(135deg, #1a1d3a 0%, #2d1b69 30%, #1e293b 60%, #0f1419 100%)',
+      liveUrl: 'https://your-task-app.com',
+      githubUrl: 'https://github.com/yourusername/task-app',
+      techStack: [
+        {
+          name: 'React',
+          gradient: 'from-purple-400/10 to-cyan-500/10',
+          borderColor: 'border-purple-400/30',
+          textColor: 'text-purple-300',
+          hoverGradient: 'hover:from-purple-400/20 hover:to-cyan-500/20',
+        },
+        {
+          name: 'Firebase',
+          gradient: 'from-cyan-400/10 to-blue-500/10',
+          borderColor: 'border-cyan-400/30',
+          textColor: 'text-cyan-300',
+          hoverGradient: 'hover:from-cyan-400/20 hover:to-blue-500/20',
+        },
+        {
+          name: 'TypeScript',
+          gradient: 'from-blue-400/10 to-purple-500/10',
+          borderColor: 'border-blue-400/30',
+          textColor: 'text-blue-300',
+          hoverGradient: 'hover:from-blue-400/20 hover:to-purple-500/20',
+        },
+      ],
+      buttons: [
+        {
+          text: 'Live Demo',
+          bgColor: 'bg-purple-500/20',
+          borderColor: 'border-purple-400/30',
+          textColor: 'text-purple-300',
+          hoverBgColor: 'hover:bg-purple-500/30',
+        },
+        {
+          text: 'Source Code',
+          bgColor: 'bg-cyan-500/20',
+          borderColor: 'border-cyan-400/30',
+          textColor: 'text-cyan-300',
+          hoverBgColor: 'hover:bg-cyan-500/30',
+        },
+      ],
+      stats: {
+        icon: 'M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z',
+        label: 'Popular',
+        color: 'text-purple-300',
+      },
+      gradients: {
+        card: 'from-purple-400/5 via-cyan-500/5 to-blue-600/5',
+        title: 'from-purple-400 to-cyan-500',
+        titleHover: 'hover:from-purple-300 hover:to-cyan-400',
+        image: 'from-purple-500/20 via-blue-600/20 to-cyan-500/20',
+      },
+      borderColors: [
+        'border-purple-400',
+        'border-cyan-400',
+        'border-blue-400',
+        'border-purple-400',
+      ],
+    },
+    {
+      id: 3,
+      title: 'Neon Dash',
+      description:
+        'A fun casual web game with <span class="text-blue-300 font-medium">dark neon aesthetics</span>, <span class="text-purple-300 font-medium">smooth animations</span>, and <span class="text-cyan-300 font-medium">modern UI/UX</span> design.',
+      image:
+        'https://i.pinimg.com/736x/7a/aa/0d/7aaa0d087145bfa953daa8e1270137ad.jpg',
+      emoji: '💀',
+      year: '2024',
+      backgroundImage:
+        'linear-gradient(135deg, #0f172a 0%, #1a365d 30%, #1e293b 60%, #0f1419 100%)',
+      liveUrl: 'https://your-neon-dash.com',
+      githubUrl: 'https://github.com/yourusername/neon-dash',
+      techStack: [
+        {
+          name: 'HTML',
+          gradient: 'from-blue-400/10 to-purple-500/10',
+          borderColor: 'border-blue-400/30',
+          textColor: 'text-blue-300',
+          hoverGradient: 'hover:from-blue-400/20 hover:to-purple-500/20',
+        },
+        {
+          name: 'CSS',
+          gradient: 'from-purple-400/10 to-cyan-500/10',
+          borderColor: 'border-purple-400/30',
+          textColor: 'text-purple-300',
+          hoverGradient: 'hover:from-purple-400/20 hover:to-cyan-500/20',
+        },
+        {
+          name: 'JavaScript',
+          gradient: 'from-cyan-400/10 to-blue-500/10',
+          borderColor: 'border-cyan-400/30',
+          textColor: 'text-cyan-300',
+          hoverGradient: 'hover:from-cyan-400/20 hover:to-blue-500/20',
+        },
+      ],
+      buttons: [
+        {
+          text: 'Live Demo',
+          bgColor: 'bg-blue-500/20',
+          borderColor: 'border-blue-400/30',
+          textColor: 'text-blue-300',
+          hoverBgColor: 'hover:bg-blue-500/30',
+        },
+        {
+          text: 'Source Code',
+          bgColor: 'bg-purple-500/20',
+          borderColor: 'border-purple-400/30',
+          textColor: 'text-purple-300',
+          hoverBgColor: 'hover:bg-purple-500/30',
+        },
+      ],
+      stats: {
+        icon: 'M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z',
+        label: 'Web browser game',
+        color: 'text-blue-300',
+      },
+      gradients: {
+        card: 'from-blue-600/5 via-purple-400/5 to-cyan-500/5',
+        title: 'from-blue-400 to-purple-500',
+        titleHover: 'hover:from-blue-300 hover:to-purple-400',
+        image: 'from-blue-500/20 via-purple-600/20 to-cyan-500/20',
+      },
+      borderColors: [
+        'border-blue-400',
+        'border-purple-400',
+        'border-cyan-400',
+        'border-blue-400',
+      ],
+    },
+    {
+      id: 4,
+      title: 'E-commerce Platform',
+      description:
+        'A full-stack e-commerce solution with <span class="text-green-300 font-medium">payment integration</span>, <span class="text-blue-300 font-medium">inventory management</span>, and <span class="text-purple-300 font-medium">admin dashboard</span>.',
+      image:
+        'https://i.pinimg.com/736x/7a/aa/0d/7aaa0d087145bfa953daa8e1270137ad.jpg',
+      emoji: '🛒',
+      year: '2024',
+      backgroundImage:
+        'linear-gradient(135deg, #2d1b69 0%, #7c3aed 30%, #1e293b 60%, #0f1419 100%)',
+      liveUrl: 'https://your-ecommerce.com',
+      githubUrl: 'https://github.com/yourusername/ecommerce',
+      techStack: [
+        {
+          name: 'Next.js',
+          gradient: 'from-green-400/10 to-blue-500/10',
+          borderColor: 'border-green-400/30',
+          textColor: 'text-green-300',
+          hoverGradient: 'hover:from-green-400/20 hover:to-blue-500/20',
+        },
+        {
+          name: 'MongoDB',
+          gradient: 'from-blue-400/10 to-purple-500/10',
+          borderColor: 'border-blue-400/30',
+          textColor: 'text-blue-300',
+          hoverGradient: 'hover:from-blue-400/20 hover:to-purple-500/20',
+        },
+        {
+          name: 'Stripe',
+          gradient: 'from-purple-400/10 to-green-500/10',
+          borderColor: 'border-purple-400/30',
+          textColor: 'text-purple-300',
+          hoverGradient: 'hover:from-purple-400/20 hover:to-green-500/20',
+        },
+      ],
+      buttons: [
+        {
+          text: 'Live Demo',
+          bgColor: 'bg-green-500/20',
+          borderColor: 'border-green-400/30',
+          textColor: 'text-green-300',
+          hoverBgColor: 'hover:bg-green-500/30',
+        },
+        {
+          text: 'Source Code',
+          bgColor: 'bg-blue-500/20',
+          borderColor: 'border-blue-400/30',
+          textColor: 'text-blue-300',
+          hoverBgColor: 'hover:bg-blue-500/30',
+        },
+      ],
+      stats: {
+        icon: 'M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z',
+        label: 'Full-stack Project',
+        color: 'text-green-300',
+      },
+      gradients: {
+        card: 'from-green-400/5 via-blue-500/5 to-purple-400/5',
+        title: 'from-green-400 to-blue-500',
+        titleHover: 'hover:from-green-300 hover:to-blue-400',
+        image: 'from-green-500/20 via-blue-600/20 to-purple-500/20',
+      },
+      borderColors: [
+        'border-green-400',
+        'border-blue-400',
+        'border-purple-400',
+        'border-green-400',
+      ],
+    },
+  ];
+
+  ngOnInit() {
+    this.calculateCarouselSettings();
+    this.startAutoSlide();
+  }
+
+  ngOnDestroy() {
+    this.stopAutoSlide();
+  }
+
+  // Method called from template
+  getScreenSize(): ScreenSize {
+    return this.currentScreenSize;
+  }
+
+  // Touch event handlers called from template
+  onTouchStart(event: TouchEvent) {
+    if (!this.isSwipeEnabled || event.touches.length !== 1) return;
+    this.touchStartX = event.touches[0].clientX;
+    this.stopAutoSlide();
+  }
+
+  onTouchMove(event: TouchEvent) {
+    if (!this.isSwipeEnabled || event.touches.length !== 1) return;
+    event.preventDefault();
+  }
+
+  onTouchEnd(event: TouchEvent) {
+    if (!this.isSwipeEnabled || event.changedTouches.length !== 1) return;
+    this.touchEndX = event.changedTouches[0].clientX;
+    this.handleSwipe();
+    setTimeout(() => this.startAutoSlide(), 1000);
+  }
+
+  private handleSwipe() {
+    const swipeDistance = this.touchStartX - this.touchEndX;
+    const absDistance = Math.abs(swipeDistance);
+
+    if (absDistance < this.swipeThreshold) return;
+
+    if (swipeDistance > 0) {
+      this.nextSlide(); // Swipe left
+    } else {
+      this.prevSlide(); // Swipe right
+    }
+  }
+
+  // Get current background based on active project
+  getCurrentBackground(): string {
+    const currentProject = this.featuredProjects[this.currentIndex];
+    if (currentProject && currentProject.backgroundImage) {
+      return currentProject.backgroundImage;
+    }
+    // Fallback to cycling through background images
+    const bgIndex = this.currentIndex % this.backgroundImages.length;
+    return this.backgroundImages[bgIndex];
+  }
+
+  // Calculate carousel settings based on screen size
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+    this.calculateCarouselSettings();
+  }
+
+  // Update your calculateCarouselSettings method to set currentScreenSize
+  private calculateCarouselSettings() {
+    const screenWidth = window.innerWidth;
+
+    // Added: set screen size bucket
+    if (screenWidth < 640) {
+      this.currentScreenSize = 'mobile';
+    } else if (screenWidth < 1024) {
+      this.currentScreenSize = 'tablet';
+    } else {
+      this.currentScreenSize = 'desktop';
+    }
+
+    // Existing logic for slidesToShow/slideWidth
+    if (screenWidth >= 1280) {
+      // XL screens: show 3 cards
+      this.slidesToShow = 3;
+      this.slideWidth = 100 / 3; // Each slide takes 33.33% width
+    } else if (screenWidth >= 1024) {
+      // LG screens: show 2 cards
+      this.slidesToShow = 2;
+      this.slideWidth = 100 / 2; // Each slide takes 50% width
+    } else {
+      // Mobile/tablet: show 1 card
+      this.slidesToShow = 1;
+      this.slideWidth = 100; // Each slide takes 100% width
+    }
+
+    // Calculate max index based on slides to show
+    this.maxIndex = Math.max(
+      0,
+      this.featuredProjects.length - this.slidesToShow
+    );
+
+    // Reset current index if it exceeds the new max
+    if (this.currentIndex > this.maxIndex) {
+      this.currentIndex = this.maxIndex;
+    }
+  }
+
+  // Auto-slide functionality
+  private startAutoSlide() {
+    this.stopAutoSlide(); // Clear any existing interval
+    this.autoSlideInterval = setInterval(() => {
+      this.nextSlide();
+    }, this.autoSlideDelay);
+  }
+
+  private stopAutoSlide() {
+    if (this.autoSlideInterval) {
+      clearInterval(this.autoSlideInterval);
+      this.autoSlideInterval = undefined;
+    }
+  }
+
+  private resetAutoSlide() {
+    this.stopAutoSlide();
+    this.startAutoSlide();
+  }
+
+  // Carousel navigation methods
+  nextSlide() {
+    if (this.currentIndex < this.maxIndex) {
+      this.currentIndex++;
+    } else {
+      this.currentIndex = 0; // Loop back to start
+    }
+    this.resetAutoSlide();
+  }
+
+  prevSlide() {
+    if (this.currentIndex > 0) {
+      this.currentIndex--;
+    } else {
+      this.currentIndex = this.maxIndex; // Loop to end
+    }
+    this.resetAutoSlide();
+  }
+
+  goToSlide(index: number) {
+    if (index >= 0 && index <= this.maxIndex) {
+      this.currentIndex = index;
+      this.resetAutoSlide();
+    }
+  }
+
+  // Helper method for indicators
+  getIndicatorArray(): number[] {
+    return Array(this.maxIndex + 1).fill(0);
+  }
+
+  // TrackBy function for optimal rendering performance
+  trackByProjectId(index: number, project: Project): number {
+    return project.id;
+  }
+
+  // Update your existing method to handle "Play Game" buttons
+  onProjectButtonClick(project: Project, buttonText: string) {
+    this.stopAutoSlide();
+
+    const normalizedButtonText = (buttonText || '').toLowerCase();
+
+    if (
+      (normalizedButtonText.includes('demo') ||
+        normalizedButtonText.includes('play')) &&
+      project.liveUrl
+    ) {
+      window.open(project.liveUrl, '_blank', 'noopener,noreferrer');
+    } else if (normalizedButtonText.includes('source') && project.githubUrl) {
+      window.open(project.githubUrl, '_blank', 'noopener,noreferrer');
+    }
+
+    setTimeout(() => this.startAutoSlide(), 3000);
+  }
+
+  // Mouse hover handlers called from template
+  onMouseEnter() {
+    this.stopAutoSlide();
+  }
+
+  onMouseLeave() {
+    this.startAutoSlide();
+  }
+
+  // Additional utility methods
+
+  // Get current visible projects (useful for debugging)
+  getCurrentVisibleProjects(): Project[] {
+    return this.featuredProjects.slice(
+      this.currentIndex,
+      this.currentIndex + this.slidesToShow
+    );
+  }
+
+  // Check if project has valid navigation URLs
+  hasValidUrls(project: Project): boolean {
+    return !!(project.liveUrl || project.githubUrl);
+  }
+
+  // Get responsive slide count for template
+  getResponsiveSlideCount(): number {
+    return this.slidesToShow;
+  }
 }

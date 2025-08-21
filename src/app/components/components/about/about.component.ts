@@ -19,10 +19,22 @@ export class AboutComponent implements OnInit, OnDestroy {
   private minSwipeDistance = 50;
 
   carouselImages = [
-    { url: 'assets/images/about-1.jpg', alt: 'About Me - Photo 1' },
-    { url: 'assets/images/about-2.jpg', alt: 'About Me - Photo 2' },
-    { url: 'assets/images/about-3.jpg', alt: 'About Me - Photo 3' },
-    { url: 'assets/images/about-4.jpg', alt: 'About Me - Photo 4' },
+    {
+      url: 'https://i.pinimg.com/736x/7a/aa/0d/7aaa0d087145bfa953daa8e1270137ad.jpg',
+      alt: 'About Me - Photo 1',
+    },
+    {
+      url: 'https://i.pinimg.com/736x/7a/aa/0d/7aaa0d087145bfa953daa8e1270137ad.jpg',
+      alt: 'About Me - Photo 2',
+    },
+    {
+      url: 'https://i.pinimg.com/736x/7a/aa/0d/7aaa0d087145bfa953daa8e1270137ad.jpg',
+      alt: 'About Me - Photo 3',
+    },
+    {
+      url: 'https://i.pinimg.com/736x/7a/aa/0d/7aaa0d087145bfa953daa8e1270137ad.jpg',
+      alt: 'About Me - Photo 4',
+    },
   ];
 
   ngOnInit() {
