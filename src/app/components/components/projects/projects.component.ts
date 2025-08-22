@@ -16,7 +16,6 @@ interface Project {
   year: string;
   gradients: ProjectGradients;
   borderColors: string[];
-  backgroundImage?: string; // Added for dynamic backgrounds
   liveUrl?: string; // Added for actual navigation
   githubUrl?: string; // Added for actual navigation
 }
@@ -74,15 +73,6 @@ export class ProjectsComponent implements OnInit, OnDestroy {
   private swipeThreshold = 50;
   private isSwipeEnabled = true;
 
-  // Background images for dynamic section backgrounds
-  backgroundImages = [
-    'linear-gradient(135deg, #0f1419 0%, #1a1d3a 30%, #0f172a 60%, #0d1117 100%)',
-    'linear-gradient(135deg, #1a1d3a 0%, #2d1b69 30%, #1e293b 60%, #0f1419 100%)',
-    'linear-gradient(135deg, #0f172a 0%, #1a365d 30%, #1e293b 60%, #0f1419 100%)',
-    'linear-gradient(135deg, #2d1b69 0%, #7c3aed 30%, #1e293b 60%, #0f1419 100%)',
-    'linear-gradient(135deg, #1a365d 0%, #0891b2 30%, #1e293b 60%, #0f1419 100%)',
-  ];
-
   // Featured Projects Data
   featuredProjects: Project[] = [
     {
@@ -94,8 +84,6 @@ export class ProjectsComponent implements OnInit, OnDestroy {
         'https://i.pinimg.com/736x/7a/aa/0d/7aaa0d087145bfa953daa8e1270137ad.jpg',
       emoji: '🎨',
       year: '2024',
-      backgroundImage:
-        'linear-gradient(135deg, #0f1419 0%, #1a1d3a 30%, #0f172a 60%, #0d1117 100%)',
       liveUrl: 'https://your-portfolio.com',
       githubUrl: 'https://github.com/yourusername/portfolio',
       techStack: [
@@ -164,8 +152,6 @@ export class ProjectsComponent implements OnInit, OnDestroy {
         'https://i.pinimg.com/736x/7a/aa/0d/7aaa0d087145bfa953daa8e1270137ad.jpg',
       emoji: '📱',
       year: '2024',
-      backgroundImage:
-        'linear-gradient(135deg, #1a1d3a 0%, #2d1b69 30%, #1e293b 60%, #0f1419 100%)',
       liveUrl: 'https://your-task-app.com',
       githubUrl: 'https://github.com/yourusername/task-app',
       techStack: [
@@ -234,8 +220,6 @@ export class ProjectsComponent implements OnInit, OnDestroy {
         'https://i.pinimg.com/736x/7a/aa/0d/7aaa0d087145bfa953daa8e1270137ad.jpg',
       emoji: '💀',
       year: '2024',
-      backgroundImage:
-        'linear-gradient(135deg, #0f172a 0%, #1a365d 30%, #1e293b 60%, #0f1419 100%)',
       liveUrl: 'https://your-neon-dash.com',
       githubUrl: 'https://github.com/yourusername/neon-dash',
       techStack: [
@@ -304,8 +288,6 @@ export class ProjectsComponent implements OnInit, OnDestroy {
         'https://i.pinimg.com/736x/7a/aa/0d/7aaa0d087145bfa953daa8e1270137ad.jpg',
       emoji: '🛒',
       year: '2024',
-      backgroundImage:
-        'linear-gradient(135deg, #2d1b69 0%, #7c3aed 30%, #1e293b 60%, #0f1419 100%)',
       liveUrl: 'https://your-ecommerce.com',
       githubUrl: 'https://github.com/yourusername/ecommerce',
       techStack: [
@@ -413,17 +395,6 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Get current background based on active project
-  getCurrentBackground(): string {
-    const currentProject = this.featuredProjects[this.currentIndex];
-    if (currentProject && currentProject.backgroundImage) {
-      return currentProject.backgroundImage;
-    }
-    // Fallback to cycling through background images
-    const bgIndex = this.currentIndex % this.backgroundImages.length;
-    return this.backgroundImages[bgIndex];
-  }
-
   // Calculate carousel settings based on screen size
   @HostListener('window:resize', ['$event'])
   onResize() {
@@ -526,7 +497,7 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     return project.id;
   }
 
-  // Update your existing method to handle "Play Game" buttons
+  // Handle button clicks for Live Demo and Source Code
   onProjectButtonClick(project: Project, buttonText: string) {
     this.stopAutoSlide();
 
@@ -543,34 +514,5 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     }
 
     setTimeout(() => this.startAutoSlide(), 3000);
-  }
-
-  // Mouse hover handlers called from template
-  onMouseEnter() {
-    this.stopAutoSlide();
-  }
-
-  onMouseLeave() {
-    this.startAutoSlide();
-  }
-
-  // Additional utility methods
-
-  // Get current visible projects (useful for debugging)
-  getCurrentVisibleProjects(): Project[] {
-    return this.featuredProjects.slice(
-      this.currentIndex,
-      this.currentIndex + this.slidesToShow
-    );
-  }
-
-  // Check if project has valid navigation URLs
-  hasValidUrls(project: Project): boolean {
-    return !!(project.liveUrl || project.githubUrl);
-  }
-
-  // Get responsive slide count for template
-  getResponsiveSlideCount(): number {
-    return this.slidesToShow;
   }
 }

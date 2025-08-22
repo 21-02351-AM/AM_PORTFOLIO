@@ -1,10 +1,49 @@
+<!-- Carousel Navigation Buttons -->
+<!-- Desktop/Tablet Navigation (overlaid on cards) -->
+<button
+  (click)="prevSlide()"
+  [disabled]="currentIndex === 0"
+  class="hidden sm:block absolute left-1 sm:left-2 md:left-4 top-1/2 transform -translate-y-1/2 z-10 p-2 sm:p-3 bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 hover:border-blue-400/50 rounded-full text-white transition-all duration-300 hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
+>
+  <svg
+    class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-400"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M15 19l-7-7 7-7"
+    />
+  </svg>
+</button>
+
+<button
+  (click)="nextSlide()"
+  [disabled]="currentIndex >= maxIndex"
+  class="hidden sm:block absolute right-1 sm:right-2 md:right-4 top-1/2 transform -translate-y-1/2 z-10 p-2 sm:p-3 bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 hover:border-blue-400/50 rounded-full text-white transition-all duration-300 hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
+>
+  <svg
+    class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-400"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M9 5l7 7-7 7"
+    />
+  </svg>
+</button>
+
 <!-- projects.component.html -->
 <section
   id="projects"
-  class="w-full text-white flex flex-col items-center justify-center px-2 xs:px-4 sm:px-6 lg:px-8 py-8 xs:py-10 sm:py-12 md:py-16 lg:py-20 relative bg-no-repeat transition-all duration-500"
-  [style.background-image]="getCurrentBackground()"
-  [style.background-size]="'cover'"
-  [style.background-position]="'center center'"
+  class="w-full text-white flex flex-col items-center justify-center px-2 xs:px-4 sm:px-6 lg:px-8 py-8 xs:py-10 sm:py-12 md:py-16 lg:py-20 relative"
   [style.min-height]="'100vh'"
 >
   <div
@@ -82,9 +121,9 @@
                     />
                   </ng-template>
 
-                  <!-- Hover Overlay with Dynamic Buttons -->
+                  <!-- Desktop Hover Overlay with Dynamic Buttons (hidden on mobile) -->
                   <div
-                    class="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-2 xs:pb-3 sm:pb-4"
+                    class="hidden sm:flex absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 items-end justify-center pb-2 xs:pb-3 sm:pb-4"
                   >
                     <div
                       class="flex flex-wrap justify-center gap-1 xs:gap-2 sm:gap-3 px-2"
@@ -161,6 +200,25 @@
                   </span>
                 </div>
 
+                <!-- Mobile Action Buttons (only visible on mobile) -->
+                <div class="sm:hidden flex flex-wrap gap-2 mb-4 relative z-30">
+                  <button
+                    *ngFor="let button of project.buttons"
+                    (click)="onProjectButtonClick(project, button.text)"
+                    (touchstart)="$event.stopPropagation()"
+                    (touchend)="$event.stopPropagation()"
+                    class="flex-1 min-w-0 px-3 py-2 {{
+                      button.bgColor
+                    }} backdrop-blur-sm border {{
+                      button.borderColor
+                    }} rounded-lg {{ button.textColor }} text-xs font-medium {{
+                      button.hoverBgColor
+                    }} transition-all duration-300 text-center"
+                  >
+                    {{ button.text }}
+                  </button>
+                </div>
+
                 <!-- Dynamic Project Stats -->
                 <div
                   class="flex items-center justify-between text-xs xs:text-sm"
@@ -212,16 +270,19 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Carousel Navigation Buttons -->
-      <!-- Desktop/Tablet Navigation -->
+    <!-- Navigation Buttons (for all devices) -->
+    <div
+      class="flex justify-center items-center space-x-4 mb-6 xs:mb-8 relative z-30"
+    >
       <button
         (click)="prevSlide()"
         [disabled]="currentIndex === 0"
-        class="hidden sm:block absolute left-1 sm:left-2 md:left-4 top-1/2 transform -translate-y-1/2 z-10 p-2 sm:p-3 bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 hover:border-blue-400/50 rounded-full text-white transition-all duration-300 hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
+        class="p-2 xs:p-3 bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 hover:border-blue-400/50 rounded-full text-white transition-all duration-300 hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
       >
         <svg
-          class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-400"
+          class="w-4 h-4 xs:w-5 xs:h-5 text-blue-400"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -235,13 +296,17 @@
         </svg>
       </button>
 
+      <div class="flex items-center space-x-2 text-gray-400 text-sm">
+        <span>{{ currentIndex + 1 }} / {{ featuredProjects.length }}</span>
+      </div>
+
       <button
         (click)="nextSlide()"
         [disabled]="currentIndex >= maxIndex"
-        class="hidden sm:block absolute right-1 sm:right-2 md:right-4 top-1/2 transform -translate-y-1/2 z-10 p-2 sm:p-3 bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 hover:border-blue-400/50 rounded-full text-white transition-all duration-300 hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
+        class="p-2 xs:p-3 bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 hover:border-blue-400/50 rounded-full text-white transition-all duration-300 hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
       >
         <svg
-          class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-400"
+          class="w-4 h-4 xs:w-5 xs:h-5 text-blue-400"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -254,51 +319,6 @@
           />
         </svg>
       </button>
-
-      <!-- Mobile Navigation Buttons -->
-      <div
-        class="sm:hidden absolute bottom-2 left-1/2 transform -translate-x-1/2 z-10 flex space-x-2"
-      >
-        <button
-          (click)="prevSlide()"
-          [disabled]="currentIndex === 0"
-          class="p-2 bg-gray-900/60 backdrop-blur-sm border border-gray-700/50 hover:border-blue-400/50 rounded-full text-white transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          <svg
-            class="w-4 h-4 text-blue-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
-
-        <button
-          (click)="nextSlide()"
-          [disabled]="currentIndex >= maxIndex"
-          class="p-2 bg-gray-900/60 backdrop-blur-sm border border-gray-700/50 hover:border-blue-400/50 rounded-full text-white transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          <svg
-            class="w-4 h-4 text-blue-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
-      </div>
     </div>
 
     <!-- Carousel Indicators -->
@@ -368,13 +388,13 @@
       ></div>
     </div>
 
-    <!-- Touch/Swipe Area for Mobile -->
+    <!-- Touch/Swipe Area for Mobile - Only on carousel track -->
     <div
-      class="sm:hidden fixed inset-x-0 top-0 h-full pointer-events-none z-0"
+      class="sm:hidden absolute pointer-events-none z-0"
       (touchstart)="onTouchStart($event)"
       (touchmove)="onTouchMove($event)"
       (touchend)="onTouchEnd($event)"
-      style="pointer-events: auto"
+      style="pointer-events: auto; top: 120px; left: 0; right: 0; bottom: 350px"
     ></div>
   </div>
 </section>
