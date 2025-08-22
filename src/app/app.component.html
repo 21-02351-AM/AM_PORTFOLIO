@@ -62,13 +62,17 @@
   <app-projects></app-projects>
 </section>
 
-<!-- Modified contact section for better responsiveness -->
-<section
-  id="contact"
-  class="min-h-screen flex items-center scroll-mt-20 w-full"
->
-  <div class="w-full">
-    <app-contact></app-contact>
+<!-- Modified contact section to work with footer -->
+<section id="contact" class="flex flex-col min-h-screen scroll-mt-20 w-full">
+  <!-- Contact content takes most of the space -->
+  <div class="flex-1 flex items-center w-full min-h-[80vh]">
+    <div class="w-full">
+      <app-contact></app-contact>
+    </div>
+  </div>
+
+  <!-- Footer at the bottom of the same screen -->
+  <div class="mt-auto">
+    <app-footer></app-footer>
   </div>
 </section>
-<app-footer></app-footer>
