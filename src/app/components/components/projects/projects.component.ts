@@ -77,15 +77,14 @@ export class ProjectsComponent implements OnInit, OnDestroy {
   featuredProjects: Project[] = [
     {
       id: 1,
-      title: 'Portfolio Website',
+      title: 'Photography Website',
       description:
-        'A responsive portfolio showcase featuring <span class="text-blue-300 font-medium">dark neon aesthetics</span>, <span class="text-purple-300 font-medium">smooth animations</span>, and <span class="text-cyan-300 font-medium">modern UI/UX</span> design.',
-      image:
-        'https://i.pinimg.com/736x/7a/aa/0d/7aaa0d087145bfa953daa8e1270137ad.jpg',
+        'A sample photography website where the owner can <span class="text-blue-300 font-medium">feature their work releated projects</span>.',
+      image: 'project_images/Photo-web.png',
       emoji: '🎨',
-      year: '2024',
-      liveUrl: 'https://your-portfolio.com',
-      githubUrl: 'https://github.com/yourusername/portfolio',
+      year: '2025',
+      liveUrl: 'https://photography-ashy-six.vercel.app/',
+      githubUrl: 'https://github.com/21-02351-AM/Photography',
       techStack: [
         {
           name: 'Angular',
@@ -102,7 +101,14 @@ export class ProjectsComponent implements OnInit, OnDestroy {
           hoverGradient: 'hover:from-purple-400/20 hover:to-cyan-500/20',
         },
         {
-          name: 'GSAP',
+          name: 'PostgreSQL',
+          gradient: 'from-cyan-400/10 to-blue-500/10',
+          borderColor: 'border-cyan-400/30',
+          textColor: 'text-cyan-300',
+          hoverGradient: 'hover:from-cyan-400/20 hover:to-blue-500/20',
+        },
+        {
+          name: 'Email JS',
           gradient: 'from-cyan-400/10 to-blue-500/10',
           borderColor: 'border-cyan-400/30',
           textColor: 'text-cyan-300',
@@ -145,32 +151,31 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     },
     {
       id: 2,
-      title: 'Task Management App',
+      title: 'Neon Dash',
       description:
-        'A collaborative productivity app with <span class="text-purple-300 font-medium">real-time sync</span>, <span class="text-cyan-300 font-medium">team collaboration</span>, and <span class="text-blue-300 font-medium">advanced analytics</span> dashboard.',
-      image:
-        'https://i.pinimg.com/736x/7a/aa/0d/7aaa0d087145bfa953daa8e1270137ad.jpg',
+        'A webgame developed using only <span class="text-purple-300 font-medium">HTML</span>, <span class="text-cyan-300 font-medium">CSS</span>, and <span class="text-blue-300 font-medium">JavaScript</span> . \n',
+      image: 'project_images/neon-dash_image.png',
       emoji: '📱',
-      year: '2024',
-      liveUrl: 'https://your-task-app.com',
-      githubUrl: 'https://github.com/yourusername/task-app',
+      year: '2025',
+      liveUrl: 'https://neon-dash-beta.vercel.app/',
+      githubUrl: 'https://github.com/21-02351-AM/Neon-dash',
       techStack: [
         {
-          name: 'React',
+          name: 'HTML',
           gradient: 'from-purple-400/10 to-cyan-500/10',
           borderColor: 'border-purple-400/30',
           textColor: 'text-purple-300',
           hoverGradient: 'hover:from-purple-400/20 hover:to-cyan-500/20',
         },
         {
-          name: 'Firebase',
+          name: 'CSS',
           gradient: 'from-cyan-400/10 to-blue-500/10',
           borderColor: 'border-cyan-400/30',
           textColor: 'text-cyan-300',
           hoverGradient: 'hover:from-cyan-400/20 hover:to-blue-500/20',
         },
         {
-          name: 'TypeScript',
+          name: 'JavaScript',
           gradient: 'from-blue-400/10 to-purple-500/10',
           borderColor: 'border-blue-400/30',
           textColor: 'text-blue-300',
@@ -213,32 +218,16 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     },
     {
       id: 3,
-      title: 'Neon Dash',
-      description:
-        'A fun casual web game with <span class="text-blue-300 font-medium">dark neon aesthetics</span>, <span class="text-purple-300 font-medium">smooth animations</span>, and <span class="text-cyan-300 font-medium">modern UI/UX</span> design.',
-      image:
-        'https://i.pinimg.com/736x/7a/aa/0d/7aaa0d087145bfa953daa8e1270137ad.jpg',
-      emoji: '💀',
-      year: '2024',
-      liveUrl: 'https://your-neon-dash.com',
-      githubUrl: 'https://github.com/yourusername/neon-dash',
+      title: 'Angeleyes',
+      description: '<span class="text-blue-300 font-medium">Unknown</span>.',
+      image: 'project_images/Angeleyes.png',
+      emoji: '🎨',
+      year: '2025',
+      liveUrl: '/',
+      githubUrl: 'https://github.com/21-02351-AM/Angeleyes',
       techStack: [
         {
-          name: 'HTML',
-          gradient: 'from-blue-400/10 to-purple-500/10',
-          borderColor: 'border-blue-400/30',
-          textColor: 'text-blue-300',
-          hoverGradient: 'hover:from-blue-400/20 hover:to-purple-500/20',
-        },
-        {
-          name: 'CSS',
-          gradient: 'from-purple-400/10 to-cyan-500/10',
-          borderColor: 'border-purple-400/30',
-          textColor: 'text-purple-300',
-          hoverGradient: 'hover:from-purple-400/20 hover:to-cyan-500/20',
-        },
-        {
-          name: 'JavaScript',
+          name: 'Python',
           gradient: 'from-cyan-400/10 to-blue-500/10',
           borderColor: 'border-cyan-400/30',
           textColor: 'text-cyan-300',
@@ -263,7 +252,7 @@ export class ProjectsComponent implements OnInit, OnDestroy {
       ],
       stats: {
         icon: 'M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z',
-        label: 'Web browser game',
+        label: 'Personal Project',
         color: 'text-blue-300',
       },
       gradients: {
@@ -277,74 +266,6 @@ export class ProjectsComponent implements OnInit, OnDestroy {
         'border-purple-400',
         'border-cyan-400',
         'border-blue-400',
-      ],
-    },
-    {
-      id: 4,
-      title: 'E-commerce Platform',
-      description:
-        'A full-stack e-commerce solution with <span class="text-green-300 font-medium">payment integration</span>, <span class="text-blue-300 font-medium">inventory management</span>, and <span class="text-purple-300 font-medium">admin dashboard</span>.',
-      image:
-        'https://i.pinimg.com/736x/7a/aa/0d/7aaa0d087145bfa953daa8e1270137ad.jpg',
-      emoji: '🛒',
-      year: '2024',
-      liveUrl: 'https://your-ecommerce.com',
-      githubUrl: 'https://github.com/yourusername/ecommerce',
-      techStack: [
-        {
-          name: 'Next.js',
-          gradient: 'from-green-400/10 to-blue-500/10',
-          borderColor: 'border-green-400/30',
-          textColor: 'text-green-300',
-          hoverGradient: 'hover:from-green-400/20 hover:to-blue-500/20',
-        },
-        {
-          name: 'MongoDB',
-          gradient: 'from-blue-400/10 to-purple-500/10',
-          borderColor: 'border-blue-400/30',
-          textColor: 'text-blue-300',
-          hoverGradient: 'hover:from-blue-400/20 hover:to-purple-500/20',
-        },
-        {
-          name: 'Stripe',
-          gradient: 'from-purple-400/10 to-green-500/10',
-          borderColor: 'border-purple-400/30',
-          textColor: 'text-purple-300',
-          hoverGradient: 'hover:from-purple-400/20 hover:to-green-500/20',
-        },
-      ],
-      buttons: [
-        {
-          text: 'Live Demo',
-          bgColor: 'bg-green-500/20',
-          borderColor: 'border-green-400/30',
-          textColor: 'text-green-300',
-          hoverBgColor: 'hover:bg-green-500/30',
-        },
-        {
-          text: 'Source Code',
-          bgColor: 'bg-blue-500/20',
-          borderColor: 'border-blue-400/30',
-          textColor: 'text-blue-300',
-          hoverBgColor: 'hover:bg-blue-500/30',
-        },
-      ],
-      stats: {
-        icon: 'M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z',
-        label: 'Full-stack Project',
-        color: 'text-green-300',
-      },
-      gradients: {
-        card: 'from-green-400/5 via-blue-500/5 to-purple-400/5',
-        title: 'from-green-400 to-blue-500',
-        titleHover: 'hover:from-green-300 hover:to-blue-400',
-        image: 'from-green-500/20 via-blue-600/20 to-purple-500/20',
-      },
-      borderColors: [
-        'border-green-400',
-        'border-blue-400',
-        'border-purple-400',
-        'border-green-400',
       ],
     },
   ];
