@@ -12,7 +12,7 @@ import { EducationComponent } from './components/components/education/education.
 import { ProjectsComponent } from './components/components/projects/projects.component';
 import { ContactComponent } from './components/components/contact/contact.component';
 import { FooterComponent } from './components/components/footer/footer.component';
-import { EducExpComponent } from './components/educ-exp/educ-exp.component';
+import { EducExpComponent } from './components/components/educ-exp/educ-exp.component';
 import { ProjectsPageComponent } from './components/components/projects-page/projects-page.component';
 
 @NgModule({
