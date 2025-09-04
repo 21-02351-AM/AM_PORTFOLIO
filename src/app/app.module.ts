@@ -14,6 +14,7 @@ import { ContactComponent } from './components/components/contact/contact.compon
 import { FooterComponent } from './components/components/footer/footer.component';
 import { EducExpComponent } from './components/components/educ-exp/educ-exp.component';
 import { ProjectsPageComponent } from './components/components/projects-page/projects-page.component';
+import { AdminComponent } from './components/admin/admin.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { ProjectsPageComponent } from './components/components/projects-page/pro
     FooterComponent,
     EducExpComponent,
     ProjectsPageComponent,
+    AdminComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule],
   providers: [],
