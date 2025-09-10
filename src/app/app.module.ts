@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -15,6 +16,7 @@ import { FooterComponent } from './components/components/footer/footer.component
 import { EducExpComponent } from './components/components/educ-exp/educ-exp.component';
 import { ProjectsPageComponent } from './components/components/projects-page/projects-page.component';
 import { AdminPanelComponent } from './components/admin/admin-panel/admin-panel.component';
+import { HomePageComponent } from './components/home-page/home-page.component';
 
 @NgModule({
   declarations: [
@@ -29,9 +31,15 @@ import { AdminPanelComponent } from './components/admin/admin-panel/admin-panel.
     FooterComponent,
     EducExpComponent,
     ProjectsPageComponent,
+    HomePageComponent,
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    ReactiveFormsModule,
+    FormsModule,
     AdminPanelComponent,
   ],
-  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule],
   providers: [],
   bootstrap: [AppComponent],
 })
