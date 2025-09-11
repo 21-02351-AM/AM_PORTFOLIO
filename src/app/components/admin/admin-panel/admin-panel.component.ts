@@ -14,32 +14,35 @@ import {
   styleUrl: './admin-panel.component.css',
 })
 export class AdminPanelComponent implements OnInit {
-  // Simple password protection
+  // Authentication
   isAuthenticated = false;
   password = '';
-  private readonly ADMIN_PASSWORD = 'admin123'; // Change this!
+  private readonly ADMIN_PASSWORD = 'admin123';
 
-  // Images data
+  // Data
   images: ImageData[] = [];
   selectedType = 'all';
+  message = '';
+  isSuccess = false;
+  isLoading = false;
 
-  // Upload form
+  // Form
   uploadForm = {
     file: null as File | null,
+    title: '',
+    description: '',
     alt: '',
     type: 'hero' as 'hero' | 'about' | 'project' | 'carousel',
     project_id: undefined as number | undefined,
   };
 
-  // Edit mode
   editingImage: ImageData | null = null;
 
-  // Available types
   imageTypes = [
-    { value: 'hero', label: 'Hero' },
-    { value: 'about', label: 'About' },
-    { value: 'project', label: 'Project' },
-    { value: 'carousel', label: 'Carousel' },
+    { value: 'hero', label: 'Hero (Profile Image - No Title/Description)' },
+    { value: 'about', label: 'About (Carousel with Title/Description)' },
+    { value: 'project', label: 'Project (With Title/Description)' },
+    { value: 'carousel', label: 'Carousel (With Title/Description)' },
   ];
 
   constructor(private imageService: ImageManagementService) {}
@@ -51,7 +54,7 @@ export class AdminPanelComponent implements OnInit {
     }
   }
 
-  // Authentication
+  // Auth
   checkAuth() {
     this.isAuthenticated = sessionStorage.getItem('admin_auth') === 'true';
   }
@@ -60,26 +63,36 @@ export class AdminPanelComponent implements OnInit {
     if (this.password === this.ADMIN_PASSWORD) {
       this.isAuthenticated = true;
       sessionStorage.setItem('admin_auth', 'true');
+      this.password = '';
       this.loadImages();
+      this.showMessage('Login successful!', true);
     } else {
-      alert('Wrong password!');
+      this.showMessage('Wrong password!', false);
+      this.password = '';
     }
   }
 
   logout() {
     this.isAuthenticated = false;
     sessionStorage.removeItem('admin_auth');
+    this.showMessage('Logged out!', true);
   }
 
-  // Image management
+  // Images
   async loadImages() {
-    this.images = await this.imageService.getImages();
+    this.isLoading = true;
+    try {
+      this.images = await this.imageService.getImages();
+      this.showMessage(`Loaded ${this.images.length} images`, true);
+    } catch (error) {
+      this.showMessage('Failed to load images', false);
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   get filteredImages() {
-    if (this.selectedType === 'all') {
-      return this.images;
-    }
+    if (this.selectedType === 'all') return this.images;
     return this.images.filter((img) => img.type === this.selectedType);
   }
 
@@ -87,32 +100,89 @@ export class AdminPanelComponent implements OnInit {
     return this.images.filter((img) => img.type === type).length;
   }
 
+  // Check if hero image upload is allowed
+  get isHeroUploadDisabled(): boolean {
+    return (
+      this.uploadForm.type === 'hero' &&
+      this.countByType('hero') >= 1 &&
+      !this.editingImage
+    );
+  }
+
+  // Check if title/description should be shown
+  get shouldShowTitleDescription(): boolean {
+    return this.uploadForm.type !== 'hero';
+  }
+
   onFileSelected(event: any) {
-    this.uploadForm.file = event.target.files[0];
-    if (this.uploadForm.file && !this.uploadForm.alt) {
-      this.uploadForm.alt = this.uploadForm.file.name.replace(/\.[^/.]+$/, '');
+    const file = event.target.files[0];
+    if (file) {
+      this.uploadForm.file = file;
+      if (!this.uploadForm.alt) {
+        this.uploadForm.alt = file.name.replace(/\.[^/.]+$/, '');
+      }
+    }
+  }
+
+  onTypeChange() {
+    // Clear title and description when switching to hero type
+    if (this.uploadForm.type === 'hero') {
+      this.uploadForm.title = '';
+      this.uploadForm.description = '';
     }
   }
 
   async uploadImage() {
-    if (!this.uploadForm.file) {
-      alert('Please select a file');
+    if (!this.uploadForm.file || !this.uploadForm.alt) {
+      this.showMessage('Please fill all required fields', false);
       return;
     }
 
-    const result = await this.imageService.uploadImage(this.uploadForm.file, {
-      alt: this.uploadForm.alt,
-      type: this.uploadForm.type,
-      project_id: this.uploadForm.project_id,
-      order_index: this.images.length,
-    });
+    // Check hero image limit
+    if (this.uploadForm.type === 'hero' && this.countByType('hero') >= 1) {
+      this.showMessage(
+        'Only one hero image is allowed. Delete the existing one first.',
+        false
+      );
+      return;
+    }
 
-    if (result) {
-      alert('Image uploaded!');
-      this.resetForm();
-      this.loadImages();
-    } else {
-      alert('Upload failed');
+    this.isLoading = true;
+    try {
+      const imageData: any = {
+        alt: this.uploadForm.alt,
+        type: this.uploadForm.type,
+        project_id: this.uploadForm.project_id,
+        order_index: this.images.length,
+      };
+
+      // Only add title/description for non-hero images
+      if (this.uploadForm.type !== 'hero') {
+        imageData.title = this.uploadForm.title;
+        imageData.description = this.uploadForm.description;
+      }
+
+      const result = await this.imageService.uploadImage(
+        this.uploadForm.file,
+        imageData
+      );
+
+      if (result) {
+        this.showMessage(
+          `${
+            this.uploadForm.type === 'hero' ? 'Hero' : 'Image'
+          } uploaded successfully!`,
+          true
+        );
+        this.resetForm();
+        await this.loadImages();
+      } else {
+        this.showMessage('Upload failed', false);
+      }
+    } catch (error) {
+      this.showMessage('Upload failed', false);
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -120,6 +190,8 @@ export class AdminPanelComponent implements OnInit {
     this.editingImage = image;
     this.uploadForm = {
       file: null,
+      title: image.title || '',
+      description: image.description || '',
       alt: image.alt,
       type: image.type,
       project_id: image.project_id,
@@ -127,32 +199,72 @@ export class AdminPanelComponent implements OnInit {
   }
 
   async updateImage() {
-    if (!this.editingImage) return;
+    if (!this.editingImage || !this.uploadForm.alt) {
+      this.showMessage('Please fill required fields', false);
+      return;
+    }
 
-    const result = await this.imageService.updateImage(this.editingImage.id, {
-      alt: this.uploadForm.alt,
-      type: this.uploadForm.type,
-      project_id: this.uploadForm.project_id,
-    });
+    this.isLoading = true;
+    try {
+      const updateData: any = {
+        alt: this.uploadForm.alt,
+        type: this.uploadForm.type,
+        project_id: this.uploadForm.project_id,
+      };
 
-    if (result) {
-      alert('Image updated!');
-      this.cancelEdit();
-      this.loadImages();
-    } else {
-      alert('Update failed');
+      // Only update title/description for non-hero images
+      if (this.uploadForm.type !== 'hero') {
+        updateData.title = this.uploadForm.title;
+        updateData.description = this.uploadForm.description;
+      } else {
+        // Clear title/description for hero images
+        updateData.title = null;
+        updateData.description = null;
+      }
+
+      const result = await this.imageService.updateImage(
+        this.editingImage.id,
+        updateData
+      );
+
+      if (result) {
+        this.showMessage('Image updated!', true);
+        this.cancelEdit();
+        await this.loadImages();
+      } else {
+        this.showMessage('Update failed', false);
+      }
+    } catch (error) {
+      this.showMessage('Update failed', false);
+    } finally {
+      this.isLoading = false;
     }
   }
 
   async deleteImage(image: ImageData) {
-    if (!confirm(`Delete "${image.alt}"?`)) return;
+    const confirmMessage =
+      image.type === 'hero'
+        ? `Delete the hero image "${image.alt}"? This will remove your profile picture.`
+        : `Delete "${image.alt}"?`;
 
-    const success = await this.imageService.deleteImage(image.id);
-    if (success) {
-      alert('Image deleted!');
-      this.loadImages();
-    } else {
-      alert('Delete failed');
+    if (!confirm(confirmMessage)) return;
+
+    this.isLoading = true;
+    try {
+      const success = await this.imageService.deleteImage(image.id);
+      if (success) {
+        this.showMessage(
+          `${image.type === 'hero' ? 'Hero image' : 'Image'} deleted!`,
+          true
+        );
+        await this.loadImages();
+      } else {
+        this.showMessage('Delete failed', false);
+      }
+    } catch (error) {
+      this.showMessage('Delete failed', false);
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -164,38 +276,33 @@ export class AdminPanelComponent implements OnInit {
   resetForm() {
     this.uploadForm = {
       file: null,
+      title: '',
+      description: '',
       alt: '',
       type: 'hero',
       project_id: undefined,
     };
-
     const fileInput = document.querySelector(
       'input[type="file"]'
     ) as HTMLInputElement;
     if (fileInput) fileInput.value = '';
   }
 
-  async downloadBackup() {
-    const images = await this.imageService.getImages();
-    const backup = {
-      images: images || this.images,
-      date: new Date().toISOString(),
-    };
-
-    const blob = new Blob([JSON.stringify(backup, null, 2)], {
-      type: 'application/json',
-    });
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `backup-${new Date().toDateString()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+  get allImageTypes() {
+    return [{ value: 'all', label: 'All Images' }, ...this.imageTypes];
   }
 
-  // for fixing spread in *ngFor
-  get allImageTypes() {
-    return [{ value: 'all', label: 'All' }, ...this.imageTypes];
+  private showMessage(text: string, success: boolean) {
+    this.message = text;
+    this.isSuccess = success;
+    setTimeout(() => (this.message = ''), 4000);
+  }
+
+  // Get hero image info for display
+  get heroImageInfo(): string {
+    const heroCount = this.countByType('hero');
+    if (heroCount === 0) return 'No hero image uploaded';
+    if (heroCount === 1) return 'Hero image set ✓';
+    return `${heroCount} hero images (should be 1)`;
   }
 }

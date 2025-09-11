@@ -6,17 +6,29 @@
   >
     <div class="bg-white p-8 rounded-lg shadow-md w-96">
       <h1 class="text-2xl font-bold text-center mb-6">Admin Login</h1>
+
+      <!-- Message -->
+      <div
+        *ngIf="message"
+        class="mb-4 p-3 rounded"
+        [class]="
+          isSuccess ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+        "
+      >
+        {{ message }}
+      </div>
+
       <div class="space-y-4">
         <input
           type="password"
           [(ngModel)]="password"
           placeholder="Enter password"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
           (keyup.enter)="login()"
         />
         <button
           (click)="login()"
-          class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+          class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
         >
           Login
         </button>
@@ -28,34 +40,65 @@
   <div *ngIf="isAuthenticated" class="p-6">
     <!-- Header -->
     <div class="flex justify-between items-center mb-8">
-      <h1 class="text-3xl font-bold text-gray-900">Admin Panel</h1>
-      <div class="space-x-4">
-        <button
-          (click)="downloadBackup()"
-          class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-        >
-          Backup
-        </button>
-        <button
-          (click)="logout()"
-          class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
-        >
-          Logout
-        </button>
-      </div>
+      <h1 class="text-3xl font-bold">Image Management</h1>
+      <button
+        (click)="logout()"
+        class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+      >
+        Logout
+      </button>
     </div>
 
-    <!-- Stats -->
+    <!-- Message -->
+    <div
+      *ngIf="message"
+      class="mb-4 p-4 rounded-lg"
+      [class]="
+        isSuccess ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+      "
+    >
+      {{ message }}
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="mb-4 text-center">
+      <div
+        class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+      ></div>
+      <span class="ml-2">Loading...</span>
+    </div>
+
+    <!-- Stats with Hero Image Status -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
       <div class="bg-white p-4 rounded-lg shadow">
         <div class="text-2xl font-bold text-blue-600">{{ images.length }}</div>
         <div class="text-gray-600">Total Images</div>
       </div>
-      <div class="bg-white p-4 rounded-lg shadow">
-        <div class="text-2xl font-bold text-green-600">
+      <div
+        class="bg-white p-4 rounded-lg shadow"
+        [class]="
+          countByType('hero') === 1
+            ? 'border-l-4 border-green-500'
+            : 'border-l-4 border-orange-500'
+        "
+      >
+        <div
+          class="text-2xl font-bold"
+          [class]="
+            countByType('hero') === 1 ? 'text-green-600' : 'text-orange-600'
+          "
+        >
           {{ countByType("hero") }}
         </div>
-        <div class="text-gray-600">Hero Images</div>
+        <div class="text-gray-600">Hero Image</div>
+        <div
+          class="text-xs mt-1"
+          [class]="
+            countByType('hero') === 1 ? 'text-green-600' : 'text-orange-600'
+          "
+        >
+          {{ heroImageInfo }}
+        </div>
       </div>
       <div class="bg-white p-4 rounded-lg shadow">
         <div class="text-2xl font-bold text-purple-600">
@@ -77,78 +120,140 @@
         {{ editingImage ? "Edit Image" : "Upload New Image" }}
       </h2>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <!-- File Input (only for new uploads) -->
-        <div *ngIf="!editingImage">
-          <label class="block text-sm font-medium text-gray-700 mb-2"
-            >Image File</label
-          >
-          <input
-            type="file"
-            (change)="onFileSelected($event)"
-            accept="image/*"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          />
+      <!-- Hero Image Warning -->
+      <div
+        *ngIf="
+          uploadForm.type === 'hero' &&
+          countByType('hero') >= 1 &&
+          !editingImage
+        "
+        class="mb-4 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-lg"
+      >
+        <div class="flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fill-rule="evenodd"
+              d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span class="font-medium">Only one hero image is allowed.</span>
         </div>
+        <p class="mt-1 text-sm">
+          Delete the existing hero image first, or edit it instead.
+        </p>
+      </div>
 
-        <!-- Alt Text -->
+      <div class="space-y-4">
+        <!-- Type Selection First -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2"
-            >Alt Text</label
-          >
-          <input
-            type="text"
-            [(ngModel)]="uploadForm.alt"
-            placeholder="Describe the image"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <!-- Image Type -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2"
-            >Type</label
-          >
+          <label class="block text-sm font-medium mb-2">Image Type *</label>
           <select
             [(ngModel)]="uploadForm.type"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            (ngModelChange)="onTypeChange()"
+            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
           >
             <option *ngFor="let type of imageTypes" [value]="type.value">
               {{ type.label }}
             </option>
           </select>
+          <p
+            *ngIf="uploadForm.type === 'hero'"
+            class="text-xs text-gray-500 mt-1"
+          >
+            Hero images are used for your main profile picture. Only one is
+            allowed and no title/description needed.
+          </p>
+        </div>
+
+        <!-- File Input -->
+        <div *ngIf="!editingImage">
+          <label class="block text-sm font-medium mb-2">Image File *</label>
+          <input
+            type="file"
+            (change)="onFileSelected($event)"
+            accept="image/*"
+            class="w-full px-3 py-2 border rounded-lg"
+            [disabled]="isHeroUploadDisabled"
+          />
+          <p class="text-xs text-gray-500 mt-1">
+            Max file size: 5MB. Supported: JPG, PNG, GIF, WebP
+          </p>
+        </div>
+
+        <!-- Alt Text - Always Required -->
+        <div>
+          <label class="block text-sm font-medium mb-2">Alt Text *</label>
+          <input
+            type="text"
+            [(ngModel)]="uploadForm.alt"
+            placeholder="Describe the image for accessibility"
+            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+            maxlength="200"
+          />
+          <p class="text-xs text-gray-500 mt-1">
+            {{ uploadForm.alt.length }}/200 characters
+          </p>
+        </div>
+
+        <!-- Title - Hidden for Hero Images -->
+        <div *ngIf="shouldShowTitleDescription">
+          <label class="block text-sm font-medium mb-2">Title</label>
+          <input
+            type="text"
+            [(ngModel)]="uploadForm.title"
+            placeholder="Image title (optional)"
+            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <!-- Description - Hidden for Hero Images -->
+        <div *ngIf="shouldShowTitleDescription">
+          <label class="block text-sm font-medium mb-2">Description</label>
+          <textarea
+            [(ngModel)]="uploadForm.description"
+            placeholder="Image description (optional)"
+            rows="3"
+            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+          ></textarea>
         </div>
 
         <!-- Project ID -->
         <div *ngIf="uploadForm.type === 'project'">
-          <label class="block text-sm font-medium text-gray-700 mb-2"
-            >Project ID</label
-          >
+          <label class="block text-sm font-medium mb-2">Project ID</label>
           <input
             type="number"
             [(ngModel)]="uploadForm.project_id"
             placeholder="Optional project ID"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+            min="1"
           />
         </div>
       </div>
 
       <!-- Form Actions -->
-      <div class="flex space-x-4">
+      <div class="flex space-x-4 mt-6">
         <button
           *ngIf="!editingImage"
           (click)="uploadImage()"
-          [disabled]="!uploadForm.file || !uploadForm.alt"
-          class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          [disabled]="
+            !uploadForm.file ||
+            !uploadForm.alt ||
+            isLoading ||
+            isHeroUploadDisabled
+          "
+          class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Upload Image
+          {{
+            uploadForm.type === "hero" ? "Upload Hero Image" : "Upload Image"
+          }}
         </button>
 
         <button
           *ngIf="editingImage"
           (click)="updateImage()"
-          [disabled]="!uploadForm.alt"
-          class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          [disabled]="!uploadForm.alt || isLoading"
+          class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           Update Image
         </button>
@@ -156,7 +261,7 @@
         <button
           *ngIf="editingImage"
           (click)="cancelEdit()"
-          class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+          class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700"
         >
           Cancel
         </button>
@@ -165,6 +270,7 @@
 
     <!-- Filter -->
     <div class="bg-white p-4 rounded-lg shadow mb-6">
+      <h3 class="text-sm font-medium text-gray-700 mb-2">Filter by Type:</h3>
       <div class="flex flex-wrap gap-2">
         <button
           *ngFor="let type of allImageTypes"
@@ -174,9 +280,12 @@
               ? 'bg-blue-600 text-white'
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
           "
-          class="px-4 py-2 rounded-lg transition-colors"
+          class="px-4 py-2 rounded-lg transition-colors text-sm"
         >
           {{ type.label }}
+          <span class="ml-1 text-xs opacity-75"
+            >({{ countByType(type.value === "all" ? "" : type.value) }})</span
+          >
         </button>
       </div>
     </div>
@@ -187,55 +296,99 @@
         Images ({{ filteredImages.length }})
       </h3>
 
+      <!-- Empty State -->
       <div
-        *ngIf="filteredImages.length === 0"
+        *ngIf="filteredImages.length === 0 && !isLoading"
         class="text-center py-12 text-gray-500"
       >
-        <div class="text-6xl mb-4">📷</div>
-        <p class="text-lg">No images found</p>
+        <svg
+          class="w-16 h-16 mx-auto mb-4 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
+        </svg>
+        <p class="text-lg mb-2">No images found</p>
+        <p class="text-sm">
+          {{
+            selectedType === "all"
+              ? "Upload some images to get started"
+              : "No images of this type found"
+          }}
+        </p>
       </div>
 
+      <!-- Images Grid -->
       <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+        *ngIf="filteredImages.length > 0"
       >
         <div
           *ngFor="let image of filteredImages"
-          class="border border-gray-200 rounded-lg overflow-hidden"
+          class="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+          [class]="image.type === 'hero' ? 'border-green-300 bg-green-50' : ''"
         >
-          <!-- Image -->
-          <div class="aspect-w-16 aspect-h-12">
-            <img
-              [src]="image.url"
-              [alt]="image.alt"
-              class="w-full h-48 object-cover"
-            />
+          <!-- Hero Badge -->
+          <div
+            *ngIf="image.type === 'hero'"
+            class="bg-green-100 px-3 py-1 text-green-800 text-xs font-medium"
+          >
+            HERO IMAGE (Profile Picture)
           </div>
 
-          <!-- Image Info -->
+          <!-- Image -->
+          <img
+            [src]="image.url"
+            [alt]="image.alt"
+            class="w-full h-48 object-cover"
+          />
+
+          <!-- Info -->
           <div class="p-4">
+            <!-- Title - Show for all non-hero images -->
             <h4
-              class="font-medium text-gray-900 truncate mb-2"
-              [title]="image.alt"
+              *ngIf="image.title && image.type !== 'hero'"
+              class="font-medium text-lg mb-1"
             >
-              {{ image.alt }}
+              {{ image.title }}
             </h4>
 
-            <div class="text-sm text-gray-600 mb-3">
-              <div class="flex justify-between mb-1">
+            <!-- Description - Show for all non-hero images -->
+            <p
+              *ngIf="image.description && image.type !== 'hero'"
+              class="text-gray-600 text-sm mb-2"
+            >
+              {{ image.description }}
+            </p>
+
+            <!-- Alt Text - Always show -->
+            <p class="font-medium mb-2">{{ image.alt }}</p>
+
+            <div class="text-sm text-gray-500 mb-3">
+              <div class="flex justify-between">
                 <span>Type:</span>
-                <span class="font-medium">{{ image.type }}</span>
+                <span
+                  class="font-medium capitalize"
+                  [class]="image.type === 'hero' ? 'text-green-600' : ''"
+                >
+                  {{ image.type }}{{ image.type === "hero" ? " ⭐" : "" }}
+                </span>
               </div>
-              <div *ngIf="image.project_id" class="flex justify-between mb-1">
+              <div *ngIf="image.project_id">
                 <span>Project:</span>
                 <span class="font-medium">#{{ image.project_id }}</span>
               </div>
-              <div class="flex justify-between">
+              <div *ngIf="image.created_at" class="flex justify-between">
                 <span>Created:</span>
-                <span class="font-medium text-xs">
-                  {{
-                    image.created_at ? (image.created_at | date : "short") : ""
-                  }}
-                </span>
+                <span class="font-medium">{{
+                  image.created_at | date : "short"
+                }}</span>
               </div>
             </div>
 
@@ -243,15 +396,46 @@
             <div class="flex space-x-2">
               <button
                 (click)="editImage(image)"
-                class="flex-1 bg-blue-50 text-blue-600 px-3 py-1 rounded text-sm hover:bg-blue-100 transition-colors"
+                class="flex-1 bg-blue-50 text-blue-600 px-3 py-2 rounded text-sm hover:bg-blue-100 flex items-center justify-center"
               >
+                <svg
+                  class="w-4 h-4 mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
                 Edit
               </button>
               <button
                 (click)="deleteImage(image)"
-                class="flex-1 bg-red-50 text-red-600 px-3 py-1 rounded text-sm hover:bg-red-100 transition-colors"
+                [class]="
+                  image.type === 'hero'
+                    ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                    : 'bg-red-50 text-red-600 hover:bg-red-100'
+                "
+                class="flex-1 px-3 py-2 rounded text-sm flex items-center justify-center"
               >
-                Delete
+                <svg
+                  class="w-4 h-4 mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+                {{ image.type === "hero" ? "Remove Hero" : "Delete" }}
               </button>
             </div>
           </div>

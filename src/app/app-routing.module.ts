@@ -7,7 +7,7 @@ const routes: Routes = [
   // Hidden admin route
   { path: '', component: HomePageComponent },
   {
-    path: 'secret-admin',
+    path: '0920admin-panel',
     component: AdminPanelComponent,
   },
 

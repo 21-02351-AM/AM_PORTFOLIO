@@ -7,6 +7,8 @@ export interface ImageData {
   id: string;
   name: string;
   url: string;
+  title?: string;
+  description?: string;
   alt: string;
   type: 'hero' | 'about' | 'project' | 'carousel';
   project_id?: number;
@@ -106,6 +108,8 @@ export class ImageManagementService {
         .insert({
           name: fileName,
           url: publicUrl,
+          title: imageData.title || null,
+          description: imageData.description || null,
           alt: imageData.alt || file.name,
           type: imageData.type,
           project_id: imageData.project_id,
@@ -135,7 +139,11 @@ export class ImageManagementService {
       const { data, error } = await this.supabaseService.client
         .from('images')
         .update({
-          ...updates,
+          title: updates.title || null,
+          description: updates.description || null,
+          alt: updates.alt,
+          type: updates.type,
+          project_id: updates.project_id,
           updated_at: new Date().toISOString(),
         })
         .eq('id', id)
@@ -198,30 +206,6 @@ export class ImageManagementService {
       return true;
     } catch (error) {
       console.error('Error deleting image:', error);
-      return false;
-    }
-  }
-
-  // Reorder images
-  async reorderImages(
-    images: { id: string; order_index: number }[]
-  ): Promise<boolean> {
-    try {
-      const updates = images.map((img) =>
-        this.supabaseService.client
-          .from('images')
-          .update({ order_index: img.order_index })
-          .eq('id', img.id)
-      );
-
-      await Promise.all(updates);
-
-      // Update local state
-      this.refreshImages();
-
-      return true;
-    } catch (error) {
-      console.error('Error reordering images:', error);
       return false;
     }
   }
