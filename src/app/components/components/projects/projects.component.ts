@@ -1,5 +1,9 @@
 // projects.component.ts
 import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
+import {
+  ImageManagementService,
+  ImageData,
+} from '../../../../services/image-management.service';
 
 // Add this type definition at the top
 type ScreenSize = 'mobile' | 'tablet' | 'desktop';
@@ -16,8 +20,10 @@ interface Project {
   year: string;
   gradients: ProjectGradients;
   borderColors: string[];
-  liveUrl?: string; // Added for actual navigation
-  githubUrl?: string; // Added for actual navigation
+  liveUrl?: string;
+  githubUrl?: string;
+  project_id?: number; // Added to link with database
+  alt: string; // Added for accessibility
 }
 
 interface TechTag {
@@ -58,33 +64,39 @@ interface ProjectGradients {
 export class ProjectsComponent implements OnInit, OnDestroy {
   // Carousel Properties
   currentIndex = 0;
-  slideWidth = 100; // Base width percentage for single slide
+  slideWidth = 100;
   maxIndex = 0;
   autoSlideInterval?: ReturnType<typeof setInterval>;
-  autoSlideDelay = 5000; // 5 seconds
-  slidesToShow = 1; // Number of slides visible at once
+  autoSlideDelay = 5000;
+  slidesToShow = 1;
 
-  // Add this property to track screen size
+  // Screen size and touch properties
   private currentScreenSize: ScreenSize = 'mobile';
-
-  // Add touch/swipe properties
   private touchStartX = 0;
   private touchEndX = 0;
   private swipeThreshold = 50;
   private isSwipeEnabled = true;
 
-  // Featured Projects Data
+  // Loading state
+  isLoading = true;
+
+  // Database images
+  projectImages: ImageData[] = [];
+
+  // Featured Projects Data (with dynamic image loading)
   featuredProjects: Project[] = [
     {
       id: 1,
       title: 'Photography Website',
       description:
-        'A sample photography website where the owner can <span class="text-blue-300 font-medium">feature their work releated projects</span>.',
-      image: 'project_images/Photo-web.png',
+        'A sample photography website where the owner can <span class="text-blue-300 font-medium">feature their work related projects</span>.',
+      image: '', // Will be loaded from database
       emoji: '🎨',
       year: '2025',
       liveUrl: 'https://photography-ashy-six.vercel.app/',
       githubUrl: 'https://github.com/21-02351-AM/Photography',
+      project_id: 1,
+      alt: 'Photography Website Project',
       techStack: [
         {
           name: 'Angular',
@@ -153,12 +165,14 @@ export class ProjectsComponent implements OnInit, OnDestroy {
       id: 2,
       title: 'Neon Dash',
       description:
-        'A webgame developed using only <span class="text-purple-300 font-medium">HTML</span>, <span class="text-cyan-300 font-medium">CSS</span>, and <span class="text-blue-300 font-medium">JavaScript</span> . \n',
-      image: 'project_images/neon-dash_image.png',
+        'A webgame developed using only <span class="text-purple-300 font-medium">HTML</span>, <span class="text-cyan-300 font-medium">CSS</span>, and <span class="text-blue-300 font-medium">JavaScript</span>.',
+      image: '',
       emoji: '📱',
       year: '2025',
       liveUrl: 'https://neon-dash-beta.vercel.app/',
       githubUrl: 'https://github.com/21-02351-AM/Neon-dash',
+      project_id: 2,
+      alt: 'Neon Dash Game Project',
       techStack: [
         {
           name: 'HTML',
@@ -219,12 +233,15 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     {
       id: 3,
       title: 'Angeleyes',
-      description: '<span class="text-blue-300 font-medium">Unknown</span>.',
-      image: 'project_images/Angeleyes.png',
-      emoji: '🎨',
+      description:
+        'A Python-based project with <span class="text-blue-300 font-medium">machine learning capabilities</span>.',
+      image: '',
+      emoji: '🔮',
       year: '2025',
       liveUrl: '/',
       githubUrl: 'https://github.com/21-02351-AM/Angeleyes',
+      project_id: 3,
+      alt: 'Angeleyes Python Project',
       techStack: [
         {
           name: 'Python',
@@ -270,8 +287,11 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     },
   ];
 
-  ngOnInit() {
+  constructor(private imageManagementService: ImageManagementService) {}
+
+  async ngOnInit() {
     this.calculateCarouselSettings();
+    await this.loadProjectImages();
     this.startAutoSlide();
   }
 
@@ -279,12 +299,53 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     this.stopAutoSlide();
   }
 
+  // Load project images from database
+  async loadProjectImages() {
+    this.isLoading = true;
+    try {
+      // Load all project type images
+      this.projectImages = await this.imageManagementService.getImagesByType(
+        'project'
+      );
+
+      // Update featuredProjects with actual images from database
+      this.updateProjectsWithDatabaseImages();
+    } catch (error) {
+      console.error('Error loading project images:', error);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  // Update projects with images from database
+  private updateProjectsWithDatabaseImages() {
+    this.featuredProjects = this.featuredProjects.map((project) => {
+      // Find matching image by project_id
+      const matchingImage = this.projectImages.find(
+        (img) => img.project_id === project.project_id
+      );
+
+      if (matchingImage) {
+        return {
+          ...project,
+          image: matchingImage.url,
+          title: matchingImage.title || project.title,
+          description: matchingImage.description || project.description,
+          alt: matchingImage.alt || project.alt,
+        };
+      }
+
+      // If no matching image found, keep original (will show emoji fallback)
+      return project;
+    });
+  }
+
   // Method called from template
   getScreenSize(): ScreenSize {
     return this.currentScreenSize;
   }
 
-  // Touch event handlers called from template
+  // Touch event handlers
   onTouchStart(event: TouchEvent) {
     if (!this.isSwipeEnabled || event.touches.length !== 1) return;
     this.touchStartX = event.touches[0].clientX;
@@ -310,23 +371,20 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     if (absDistance < this.swipeThreshold) return;
 
     if (swipeDistance > 0) {
-      this.nextSlide(); // Swipe left
+      this.nextSlide();
     } else {
-      this.prevSlide(); // Swipe right
+      this.prevSlide();
     }
   }
 
-  // Calculate carousel settings based on screen size
   @HostListener('window:resize', ['$event'])
   onResize() {
     this.calculateCarouselSettings();
   }
 
-  // Update your calculateCarouselSettings method to set currentScreenSize
   private calculateCarouselSettings() {
     const screenWidth = window.innerWidth;
 
-    // Added: set screen size bucket
     if (screenWidth < 640) {
       this.currentScreenSize = 'mobile';
     } else if (screenWidth < 1024) {
@@ -335,36 +393,29 @@ export class ProjectsComponent implements OnInit, OnDestroy {
       this.currentScreenSize = 'desktop';
     }
 
-    // Existing logic for slidesToShow/slideWidth
     if (screenWidth >= 1280) {
-      // XL screens: show 3 cards
       this.slidesToShow = 3;
-      this.slideWidth = 100 / 3; // Each slide takes 33.33% width
+      this.slideWidth = 100 / 3;
     } else if (screenWidth >= 1024) {
-      // LG screens: show 2 cards
       this.slidesToShow = 2;
-      this.slideWidth = 100 / 2; // Each slide takes 50% width
+      this.slideWidth = 100 / 2;
     } else {
-      // Mobile/tablet: show 1 card
       this.slidesToShow = 1;
-      this.slideWidth = 100; // Each slide takes 100% width
+      this.slideWidth = 100;
     }
 
-    // Calculate max index based on slides to show
     this.maxIndex = Math.max(
       0,
       this.featuredProjects.length - this.slidesToShow
     );
 
-    // Reset current index if it exceeds the new max
     if (this.currentIndex > this.maxIndex) {
       this.currentIndex = this.maxIndex;
     }
   }
 
-  // Auto-slide functionality
   private startAutoSlide() {
-    this.stopAutoSlide(); // Clear any existing interval
+    this.stopAutoSlide();
     this.autoSlideInterval = setInterval(() => {
       this.nextSlide();
     }, this.autoSlideDelay);
@@ -382,12 +433,11 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     this.startAutoSlide();
   }
 
-  // Carousel navigation methods
   nextSlide() {
     if (this.currentIndex < this.maxIndex) {
       this.currentIndex++;
     } else {
-      this.currentIndex = 0; // Loop back to start
+      this.currentIndex = 0;
     }
     this.resetAutoSlide();
   }
@@ -396,7 +446,7 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     if (this.currentIndex > 0) {
       this.currentIndex--;
     } else {
-      this.currentIndex = this.maxIndex; // Loop to end
+      this.currentIndex = this.maxIndex;
     }
     this.resetAutoSlide();
   }
@@ -408,17 +458,14 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Helper method for indicators
   getIndicatorArray(): number[] {
     return Array(this.maxIndex + 1).fill(0);
   }
 
-  // TrackBy function for optimal rendering performance
   trackByProjectId(index: number, project: Project): number {
     return project.id;
   }
 
-  // Handle button clicks for Live Demo and Source Code
   onProjectButtonClick(project: Project, buttonText: string) {
     this.stopAutoSlide();
 

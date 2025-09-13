@@ -40,7 +40,6 @@
   </svg>
 </button>
 
-<!-- projects.component.html -->
 <section
   id="projects"
   class="w-full text-white flex flex-col items-center justify-center px-2 xs:px-4 sm:px-6 lg:px-8 py-8 xs:py-10 sm:py-12 md:py-16 lg:py-20 relative"
@@ -64,12 +63,49 @@
       </p>
     </div>
 
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-20">
+      <div class="text-center">
+        <div
+          class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mb-4"
+        ></div>
+        <p class="text-gray-300">Loading projects...</p>
+      </div>
+    </div>
+
     <!-- Projects Carousel Container -->
     <div
+      *ngIf="!isLoading"
       class="relative overflow-hidden mb-8 xs:mb-10 sm:mb-12 md:mb-14 lg:mb-16"
     >
+      <!-- No Projects Message -->
+      <div *ngIf="featuredProjects.length === 0" class="text-center py-20">
+        <div class="text-gray-400 mb-4">
+          <svg
+            class="w-16 h-16 mx-auto mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a1 1 0 011-1h6a1 1 0 011 1v2M7 7h10"
+            ></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-300 mb-2">
+          No Projects Yet
+        </h3>
+        <p class="text-gray-400">
+          Projects will appear here once uploaded through the admin panel.
+        </p>
+      </div>
+
       <!-- Carousel Track -->
       <div
+        *ngIf="featuredProjects.length > 0"
         class="flex transition-transform duration-500 ease-in-out"
         [style.transform]="'translateX(-' + currentIndex * slideWidth + '%)'"
       >
@@ -115,9 +151,10 @@
                   <ng-template #projectImage>
                     <img
                       [src]="project.image"
-                      [alt]="project.title"
+                      [alt]="project.alt"
                       class="w-full h-full object-cover"
                       loading="lazy"
+                      (error)="project.image = ''"
                     />
                   </ng-template>
 
@@ -274,6 +311,7 @@
 
     <!-- Navigation Buttons (for all devices) -->
     <div
+      *ngIf="!isLoading && featuredProjects.length > 0"
       class="flex justify-center items-center space-x-4 mb-6 xs:mb-8 relative z-30"
     >
       <button
@@ -322,7 +360,10 @@
     </div>
 
     <!-- Carousel Indicators -->
-    <div class="flex justify-center space-x-2 xs:space-x-3 mb-6 xs:mb-8">
+    <div
+      *ngIf="!isLoading && featuredProjects.length > 0"
+      class="flex justify-center space-x-2 xs:space-x-3 mb-6 xs:mb-8"
+    >
       <button
         *ngFor="let _ of getIndicatorArray(); let i = index"
         (click)="goToSlide(i)"
@@ -337,7 +378,10 @@
     </div>
 
     <!-- Mobile Swipe Instructions -->
-    <div class="sm:hidden text-center mb-4">
+    <div
+      *ngIf="!isLoading && featuredProjects.length > 0"
+      class="sm:hidden text-center mb-4"
+    >
       <p
         class="text-gray-400 text-xs flex items-center justify-center space-x-2"
       >
@@ -373,6 +417,7 @@
 
     <!-- Floating Decorative Elements -->
     <div
+      *ngIf="!isLoading"
       class="flex justify-center space-x-2 xs:space-x-3 sm:space-x-4 opacity-30"
     >
       <div
@@ -390,6 +435,7 @@
 
     <!-- Touch/Swipe Area for Mobile - Only on carousel track -->
     <div
+      *ngIf="!isLoading && featuredProjects.length > 0"
       class="sm:hidden absolute pointer-events-none z-0"
       (touchstart)="onTouchStart($event)"
       (touchmove)="onTouchMove($event)"
