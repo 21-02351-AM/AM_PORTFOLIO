@@ -1,44 +1,5 @@
 <!-- Carousel Navigation Buttons -->
 <!-- Desktop/Tablet Navigation (overlaid on cards) -->
-<button
-  (click)="prevSlide()"
-  [disabled]="currentIndex === 0"
-  class="hidden sm:block absolute left-1 sm:left-2 md:left-4 top-1/2 transform -translate-y-1/2 z-10 p-2 sm:p-3 bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 hover:border-blue-400/50 rounded-full text-white transition-all duration-300 hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
->
-  <svg
-    class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-400"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      d="M15 19l-7-7 7-7"
-    />
-  </svg>
-</button>
-
-<button
-  (click)="nextSlide()"
-  [disabled]="currentIndex >= maxIndex"
-  class="hidden sm:block absolute right-1 sm:right-2 md:right-4 top-1/2 transform -translate-y-1/2 z-10 p-2 sm:p-3 bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 hover:border-blue-400/50 rounded-full text-white transition-all duration-300 hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
->
-  <svg
-    class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-400"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      d="M9 5l7 7-7 7"
-    />
-  </svg>
-</button>
 
 <section
   id="projects"

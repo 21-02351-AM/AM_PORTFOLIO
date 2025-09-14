@@ -1,4 +1,4 @@
-// projects.component.ts - FULLY DYNAMIC VERSION
+// projects.component.ts - FIXED VERSION
 import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import {
   ImageManagementService,
@@ -81,6 +81,9 @@ export class ProjectsComponent implements OnInit, OnDestroy {
 
   // Projects loaded from database
   featuredProjects: Project[] = [];
+
+  // Add polling interval to check for new projects
+  private projectCheckInterval?: ReturnType<typeof setInterval>;
 
   // Default styling templates
   private defaultStyles = {
@@ -180,25 +183,84 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     this.calculateCarouselSettings();
     await this.loadProjects();
     this.startAutoSlide();
+
+    // Start polling for new projects every 5 seconds
+    this.startProjectPolling();
   }
 
   ngOnDestroy() {
     this.stopAutoSlide();
+    this.stopProjectPolling();
+  }
+
+  // Start polling for project updates
+  private startProjectPolling() {
+    this.projectCheckInterval = setInterval(async () => {
+      await this.loadProjects(true); // Silent reload
+    }, 5000); // Check every 5 seconds
+  }
+
+  // Stop polling
+  private stopProjectPolling() {
+    if (this.projectCheckInterval) {
+      clearInterval(this.projectCheckInterval);
+      this.projectCheckInterval = undefined;
+    }
   }
 
   // Load all projects from database
-  async loadProjects() {
-    this.isLoading = true;
+  async loadProjects(silent: boolean = false) {
+    if (!silent) {
+      this.isLoading = true;
+    }
+
     try {
       const projectImages = await this.imageManagementService.getImagesByType(
         'project'
       );
-      this.featuredProjects = this.transformImageDataToProjects(projectImages);
+      const newProjects = this.transformImageDataToProjects(projectImages);
+
+      // Check if projects have changed
+      const projectsChanged = this.hasProjectsChanged(newProjects);
+
+      if (projectsChanged) {
+        this.featuredProjects = newProjects;
+
+        // Recalculate carousel settings after projects change
+        this.calculateCarouselSettings();
+
+        // Reset carousel if needed
+        if (this.currentIndex > this.maxIndex) {
+          this.currentIndex = Math.max(0, this.maxIndex);
+        }
+
+        // Restart auto-slide to ensure it works with new data
+        if (this.featuredProjects.length > 0) {
+          this.resetAutoSlide();
+        }
+
+        console.log('Projects updated:', this.featuredProjects.length);
+      }
     } catch (error) {
       console.error('Error loading projects:', error);
     } finally {
-      this.isLoading = false;
+      if (!silent) {
+        this.isLoading = false;
+      }
     }
+  }
+
+  // Check if projects have changed
+  private hasProjectsChanged(newProjects: Project[]): boolean {
+    if (this.featuredProjects.length !== newProjects.length) {
+      return true;
+    }
+
+    // Check if project IDs are different
+    const currentIds = this.featuredProjects.map((p) => p.id).sort();
+    const newIds = newProjects.map((p) => p.id).sort();
+
+    return JSON.stringify(currentIds) !== JSON.stringify(newIds);
   }
 
   // Transform database ImageData to Project objects
@@ -262,7 +324,6 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // All the carousel and UI methods remain the same...
   getScreenSize(): ScreenSize {
     return this.currentScreenSize;
   }
@@ -333,48 +394,73 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     if (this.currentIndex > this.maxIndex) {
       this.currentIndex = this.maxIndex;
     }
+
+    console.log('Carousel settings updated:', {
+      screenWidth,
+      slidesToShow: this.slidesToShow,
+      maxIndex: this.maxIndex,
+      currentIndex: this.currentIndex,
+      projectCount: this.featuredProjects.length,
+    });
   }
 
   private startAutoSlide() {
     this.stopAutoSlide();
-    this.autoSlideInterval = setInterval(() => {
-      this.nextSlide();
-    }, this.autoSlideDelay);
+
+    // Only start auto-slide if we have projects and can actually slide
+    if (this.featuredProjects.length > this.slidesToShow) {
+      this.autoSlideInterval = setInterval(() => {
+        this.nextSlide();
+      }, this.autoSlideDelay);
+      console.log('Auto-slide started');
+    }
   }
 
   private stopAutoSlide() {
     if (this.autoSlideInterval) {
       clearInterval(this.autoSlideInterval);
       this.autoSlideInterval = undefined;
+      console.log('Auto-slide stopped');
     }
   }
 
   private resetAutoSlide() {
+    console.log('Resetting auto-slide...');
     this.stopAutoSlide();
-    this.startAutoSlide();
+    // Small delay to ensure everything is properly updated
+    setTimeout(() => {
+      this.startAutoSlide();
+    }, 100);
   }
 
   nextSlide() {
+    if (this.featuredProjects.length === 0) return;
+
     if (this.currentIndex < this.maxIndex) {
       this.currentIndex++;
     } else {
       this.currentIndex = 0;
     }
+    console.log('Next slide:', this.currentIndex, 'of', this.maxIndex);
     this.resetAutoSlide();
   }
 
   prevSlide() {
+    if (this.featuredProjects.length === 0) return;
+
     if (this.currentIndex > 0) {
       this.currentIndex--;
     } else {
       this.currentIndex = this.maxIndex;
     }
+    console.log('Prev slide:', this.currentIndex, 'of', this.maxIndex);
     this.resetAutoSlide();
   }
 
   goToSlide(index: number) {
     if (index >= 0 && index <= this.maxIndex) {
       this.currentIndex = index;
+      console.log('Go to slide:', this.currentIndex);
       this.resetAutoSlide();
     }
   }
