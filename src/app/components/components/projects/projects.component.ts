@@ -1,15 +1,14 @@
-// projects.component.ts
+// projects.component.ts - FULLY DYNAMIC VERSION
 import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import {
   ImageManagementService,
   ImageData,
 } from '../../../../services/image-management.service';
 
-// Add this type definition at the top
 type ScreenSize = 'mobile' | 'tablet' | 'desktop';
 
 interface Project {
-  id: number;
+  id: string;
   title: string;
   description: string;
   image: string;
@@ -22,8 +21,8 @@ interface Project {
   borderColors: string[];
   liveUrl?: string;
   githubUrl?: string;
-  project_id?: number; // Added to link with database
-  alt: string; // Added for accessibility
+  project_id?: number;
+  alt: string;
 }
 
 interface TechTag {
@@ -80,218 +79,106 @@ export class ProjectsComponent implements OnInit, OnDestroy {
   // Loading state
   isLoading = true;
 
-  // Database images
-  projectImages: ImageData[] = [];
+  // Projects loaded from database
+  featuredProjects: Project[] = [];
 
-  // Featured Projects Data (with dynamic image loading)
-  featuredProjects: Project[] = [
-    {
-      id: 1,
-      title: 'Photography Website',
-      description:
-        'A sample photography website where the owner can <span class="text-blue-300 font-medium">feature their work related projects</span>.',
-      image: '', // Will be loaded from database
-      emoji: '🎨',
-      year: '2025',
-      liveUrl: 'https://photography-ashy-six.vercel.app/',
-      githubUrl: 'https://github.com/21-02351-AM/Photography',
-      project_id: 1,
-      alt: 'Photography Website Project',
-      techStack: [
-        {
-          name: 'Angular',
-          gradient: 'from-blue-400/10 to-purple-500/10',
-          borderColor: 'border-blue-400/30',
-          textColor: 'text-blue-300',
-          hoverGradient: 'hover:from-blue-400/20 hover:to-purple-500/20',
-        },
-        {
-          name: 'Tailwind CSS',
-          gradient: 'from-purple-400/10 to-cyan-500/10',
-          borderColor: 'border-purple-400/30',
-          textColor: 'text-purple-300',
-          hoverGradient: 'hover:from-purple-400/20 hover:to-cyan-500/20',
-        },
-        {
-          name: 'PostgreSQL',
-          gradient: 'from-cyan-400/10 to-blue-500/10',
-          borderColor: 'border-cyan-400/30',
-          textColor: 'text-cyan-300',
-          hoverGradient: 'hover:from-cyan-400/20 hover:to-blue-500/20',
-        },
-        {
-          name: 'Email JS',
-          gradient: 'from-cyan-400/10 to-blue-500/10',
-          borderColor: 'border-cyan-400/30',
-          textColor: 'text-cyan-300',
-          hoverGradient: 'hover:from-cyan-400/20 hover:to-blue-500/20',
-        },
-      ],
-      buttons: [
-        {
-          text: 'Live Demo',
-          bgColor: 'bg-blue-500/20',
-          borderColor: 'border-blue-400/30',
-          textColor: 'text-blue-300',
-          hoverBgColor: 'hover:bg-blue-500/30',
-        },
-        {
-          text: 'Source Code',
-          bgColor: 'bg-purple-500/20',
-          borderColor: 'border-purple-400/30',
-          textColor: 'text-purple-300',
-          hoverBgColor: 'hover:bg-purple-500/30',
-        },
-      ],
-      stats: {
-        icon: 'M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z',
-        label: 'Personal Project',
-        color: 'text-blue-300',
-      },
-      gradients: {
+  // Default styling templates
+  private defaultStyles = {
+    gradients: [
+      {
         card: 'from-blue-600/5 via-purple-400/5 to-cyan-500/5',
         title: 'from-blue-400 to-purple-500',
         titleHover: 'hover:from-blue-300 hover:to-purple-400',
         image: 'from-blue-500/20 via-purple-600/20 to-cyan-500/20',
       },
-      borderColors: [
-        'border-blue-400',
-        'border-purple-400',
-        'border-cyan-400',
-        'border-blue-400',
-      ],
-    },
-    {
-      id: 2,
-      title: 'Neon Dash',
-      description:
-        'A webgame developed using only <span class="text-purple-300 font-medium">HTML</span>, <span class="text-cyan-300 font-medium">CSS</span>, and <span class="text-blue-300 font-medium">JavaScript</span>.',
-      image: '',
-      emoji: '📱',
-      year: '2025',
-      liveUrl: 'https://neon-dash-beta.vercel.app/',
-      githubUrl: 'https://github.com/21-02351-AM/Neon-dash',
-      project_id: 2,
-      alt: 'Neon Dash Game Project',
-      techStack: [
-        {
-          name: 'HTML',
-          gradient: 'from-purple-400/10 to-cyan-500/10',
-          borderColor: 'border-purple-400/30',
-          textColor: 'text-purple-300',
-          hoverGradient: 'hover:from-purple-400/20 hover:to-cyan-500/20',
-        },
-        {
-          name: 'CSS',
-          gradient: 'from-cyan-400/10 to-blue-500/10',
-          borderColor: 'border-cyan-400/30',
-          textColor: 'text-cyan-300',
-          hoverGradient: 'hover:from-cyan-400/20 hover:to-blue-500/20',
-        },
-        {
-          name: 'JavaScript',
-          gradient: 'from-blue-400/10 to-purple-500/10',
-          borderColor: 'border-blue-400/30',
-          textColor: 'text-blue-300',
-          hoverGradient: 'hover:from-blue-400/20 hover:to-purple-500/20',
-        },
-      ],
-      buttons: [
-        {
-          text: 'Live Demo',
-          bgColor: 'bg-purple-500/20',
-          borderColor: 'border-purple-400/30',
-          textColor: 'text-purple-300',
-          hoverBgColor: 'hover:bg-purple-500/30',
-        },
-        {
-          text: 'Source Code',
-          bgColor: 'bg-cyan-500/20',
-          borderColor: 'border-cyan-400/30',
-          textColor: 'text-cyan-300',
-          hoverBgColor: 'hover:bg-cyan-500/30',
-        },
-      ],
-      stats: {
-        icon: 'M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z',
-        label: 'Popular',
-        color: 'text-purple-300',
-      },
-      gradients: {
+      {
         card: 'from-purple-400/5 via-cyan-500/5 to-blue-600/5',
         title: 'from-purple-400 to-cyan-500',
         titleHover: 'hover:from-purple-300 hover:to-cyan-400',
         image: 'from-purple-500/20 via-blue-600/20 to-cyan-500/20',
       },
-      borderColors: [
-        'border-purple-400',
-        'border-cyan-400',
-        'border-blue-400',
-        'border-purple-400',
-      ],
-    },
-    {
-      id: 3,
-      title: 'Angeleyes',
-      description:
-        'A Python-based project with <span class="text-blue-300 font-medium">machine learning capabilities</span>.',
-      image: '',
-      emoji: '🔮',
-      year: '2025',
-      liveUrl: '/',
-      githubUrl: 'https://github.com/21-02351-AM/Angeleyes',
-      project_id: 3,
-      alt: 'Angeleyes Python Project',
-      techStack: [
-        {
-          name: 'Python',
-          gradient: 'from-cyan-400/10 to-blue-500/10',
-          borderColor: 'border-cyan-400/30',
-          textColor: 'text-cyan-300',
-          hoverGradient: 'hover:from-cyan-400/20 hover:to-blue-500/20',
-        },
-      ],
-      buttons: [
-        {
-          text: 'Live Demo',
-          bgColor: 'bg-blue-500/20',
-          borderColor: 'border-blue-400/30',
-          textColor: 'text-blue-300',
-          hoverBgColor: 'hover:bg-blue-500/30',
-        },
-        {
-          text: 'Source Code',
-          bgColor: 'bg-purple-500/20',
-          borderColor: 'border-purple-400/30',
-          textColor: 'text-purple-300',
-          hoverBgColor: 'hover:bg-purple-500/30',
-        },
-      ],
-      stats: {
-        icon: 'M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z',
-        label: 'Personal Project',
-        color: 'text-blue-300',
+      {
+        card: 'from-cyan-600/5 via-blue-400/5 to-purple-500/5',
+        title: 'from-cyan-400 to-blue-500',
+        titleHover: 'hover:from-cyan-300 hover:to-blue-400',
+        image: 'from-cyan-500/20 via-blue-600/20 to-purple-500/20',
       },
-      gradients: {
-        card: 'from-blue-600/5 via-purple-400/5 to-cyan-500/5',
-        title: 'from-blue-400 to-purple-500',
-        titleHover: 'hover:from-blue-300 hover:to-purple-400',
-        image: 'from-blue-500/20 via-purple-600/20 to-cyan-500/20',
-      },
-      borderColors: [
+    ],
+    borderColors: [
+      [
         'border-blue-400',
         'border-purple-400',
         'border-cyan-400',
         'border-blue-400',
       ],
-    },
-  ];
+      [
+        'border-purple-400',
+        'border-cyan-400',
+        'border-blue-400',
+        'border-purple-400',
+      ],
+      [
+        'border-cyan-400',
+        'border-blue-400',
+        'border-purple-400',
+        'border-cyan-400',
+      ],
+    ],
+    techColors: [
+      {
+        gradient: 'from-blue-400/10 to-purple-500/10',
+        borderColor: 'border-blue-400/30',
+        textColor: 'text-blue-300',
+        hoverGradient: 'hover:from-blue-400/20 hover:to-purple-500/20',
+      },
+      {
+        gradient: 'from-purple-400/10 to-cyan-500/10',
+        borderColor: 'border-purple-400/30',
+        textColor: 'text-purple-300',
+        hoverGradient: 'hover:from-purple-400/20 hover:to-cyan-500/20',
+      },
+      {
+        gradient: 'from-cyan-400/10 to-blue-500/10',
+        borderColor: 'border-cyan-400/30',
+        textColor: 'text-cyan-300',
+        hoverGradient: 'hover:from-cyan-400/20 hover:to-blue-500/20',
+      },
+      {
+        gradient: 'from-green-400/10 to-blue-500/10',
+        borderColor: 'border-green-400/30',
+        textColor: 'text-green-300',
+        hoverGradient: 'hover:from-green-400/20 hover:to-blue-500/20',
+      },
+      {
+        gradient: 'from-orange-400/10 to-red-500/10',
+        borderColor: 'border-orange-400/30',
+        textColor: 'text-orange-300',
+        hoverGradient: 'hover:from-orange-400/20 hover:to-red-500/20',
+      },
+    ],
+    buttons: [
+      {
+        text: 'Live Demo',
+        bgColor: 'bg-blue-500/20',
+        borderColor: 'border-blue-400/30',
+        textColor: 'text-blue-300',
+        hoverBgColor: 'hover:bg-blue-500/30',
+      },
+      {
+        text: 'Source Code',
+        bgColor: 'bg-purple-500/20',
+        borderColor: 'border-purple-400/30',
+        textColor: 'text-purple-300',
+        hoverBgColor: 'hover:bg-purple-500/30',
+      },
+    ],
+  };
 
   constructor(private imageManagementService: ImageManagementService) {}
 
   async ngOnInit() {
     this.calculateCarouselSettings();
-    await this.loadProjectImages();
+    await this.loadProjects();
     this.startAutoSlide();
   }
 
@@ -299,53 +186,87 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     this.stopAutoSlide();
   }
 
-  // Load project images from database
-  async loadProjectImages() {
+  // Load all projects from database
+  async loadProjects() {
     this.isLoading = true;
     try {
-      // Load all project type images
-      this.projectImages = await this.imageManagementService.getImagesByType(
+      const projectImages = await this.imageManagementService.getImagesByType(
         'project'
       );
-
-      // Update featuredProjects with actual images from database
-      this.updateProjectsWithDatabaseImages();
+      this.featuredProjects = this.transformImageDataToProjects(projectImages);
     } catch (error) {
-      console.error('Error loading project images:', error);
+      console.error('Error loading projects:', error);
     } finally {
       this.isLoading = false;
     }
   }
 
-  // Update projects with images from database
-  private updateProjectsWithDatabaseImages() {
-    this.featuredProjects = this.featuredProjects.map((project) => {
-      // Find matching image by project_id
-      const matchingImage = this.projectImages.find(
-        (img) => img.project_id === project.project_id
-      );
+  // Transform database ImageData to Project objects
+  private transformImageDataToProjects(images: ImageData[]): Project[] {
+    return images.map((image, index) => {
+      const styleIndex = index % this.defaultStyles.gradients.length;
 
-      if (matchingImage) {
-        return {
-          ...project,
-          image: matchingImage.url,
-          title: matchingImage.title || project.title,
-          description: matchingImage.description || project.description,
-          alt: matchingImage.alt || project.alt,
-        };
+      // Parse tech stack from database or use empty array
+      let techStack: TechTag[] = [];
+      if (image.tech_stack && Array.isArray(image.tech_stack)) {
+        techStack = (image.tech_stack as any[]).map((tech, techIndex) => ({
+          name: tech.name || tech,
+          ...this.defaultStyles.techColors[
+            techIndex % this.defaultStyles.techColors.length
+          ],
+        }));
       }
 
-      // If no matching image found, keep original (will show emoji fallback)
+      // Parse project data or use defaults
+      let projectData: any = {};
+      try {
+        projectData =
+          typeof image.project_data === 'string'
+            ? JSON.parse(image.project_data)
+            : image.project_data || {};
+      } catch (e) {
+        projectData = {};
+      }
+
+      const project: Project = {
+        id: image.id,
+        title: image.title || 'Untitled Project',
+        description: image.description || 'No description available',
+        image: image.url,
+        alt: image.alt,
+        emoji: (image as any).emoji || '🚀',
+        year: (image as any).year || new Date().getFullYear().toString(),
+        liveUrl: (image as any).live_url,
+        githubUrl: (image as any).github_url,
+        project_id: image.project_id,
+
+        // Use saved styling or defaults
+        gradients:
+          projectData.gradients || this.defaultStyles.gradients[styleIndex],
+        borderColors:
+          projectData.borderColors ||
+          this.defaultStyles.borderColors[styleIndex],
+
+        techStack,
+
+        buttons: projectData.buttons || this.defaultStyles.buttons,
+
+        stats: projectData.stats || {
+          icon: 'M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z',
+          label: 'Project',
+          color: 'text-blue-300',
+        },
+      };
+
       return project;
     });
   }
 
-  // Method called from template
+  // All the carousel and UI methods remain the same...
   getScreenSize(): ScreenSize {
     return this.currentScreenSize;
   }
 
-  // Touch event handlers
   onTouchStart(event: TouchEvent) {
     if (!this.isSwipeEnabled || event.touches.length !== 1) return;
     this.touchStartX = event.touches[0].clientX;
@@ -462,7 +383,7 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     return Array(this.maxIndex + 1).fill(0);
   }
 
-  trackByProjectId(index: number, project: Project): number {
+  trackByProjectId(index: number, project: Project): string {
     return project.id;
   }
 
@@ -473,11 +394,17 @@ export class ProjectsComponent implements OnInit, OnDestroy {
 
     if (
       (normalizedButtonText.includes('demo') ||
+        normalizedButtonText.includes('live') ||
         normalizedButtonText.includes('play')) &&
       project.liveUrl
     ) {
       window.open(project.liveUrl, '_blank', 'noopener,noreferrer');
-    } else if (normalizedButtonText.includes('source') && project.githubUrl) {
+    } else if (
+      (normalizedButtonText.includes('source') ||
+        normalizedButtonText.includes('code') ||
+        normalizedButtonText.includes('github')) &&
+      project.githubUrl
+    ) {
       window.open(project.githubUrl, '_blank', 'noopener,noreferrer');
     }
 

@@ -1,4 +1,4 @@
-// src/app/services/image-management.service.ts
+// src/app/services/image-management.service.ts - UPDATED
 import { Injectable } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import { BehaviorSubject } from 'rxjs';
@@ -15,6 +15,14 @@ export interface ImageData {
   order_index?: number;
   created_at?: string;
   updated_at?: string;
+
+  // New fields for complete project management
+  emoji?: string;
+  year?: string;
+  live_url?: string;
+  github_url?: string;
+  tech_stack?: string[] | any[];
+  project_data?: any; // JSONB field for buttons, gradients, stats, etc.
 }
 
 @Injectable({
@@ -78,7 +86,7 @@ export class ImageManagementService {
     }
   }
 
-  // Upload and save image
+  // Upload and save image with all project fields
   async uploadImage(
     file: File,
     imageData: Partial<ImageData>
@@ -102,19 +110,28 @@ export class ImageManagementService {
         throw new Error('Failed to upload image');
       }
 
+      // Prepare data for database insertion
+      const dbData: any = {
+        name: fileName,
+        url: publicUrl,
+        title: imageData.title || null,
+        description: imageData.description || null,
+        alt: imageData.alt || file.name,
+        type: imageData.type,
+        project_id: imageData.project_id,
+        order_index: imageData.order_index || 0,
+        emoji: imageData.emoji || null,
+        year: imageData.year || null,
+        live_url: imageData.live_url || null,
+        github_url: imageData.github_url || null,
+        tech_stack: imageData.tech_stack || null,
+        project_data: imageData.project_data || null,
+      };
+
       // Save to database
       const { data, error } = await this.supabaseService.client
         .from('images')
-        .insert({
-          name: fileName,
-          url: publicUrl,
-          title: imageData.title || null,
-          description: imageData.description || null,
-          alt: imageData.alt || file.name,
-          type: imageData.type,
-          project_id: imageData.project_id,
-          order_index: imageData.order_index || 0,
-        })
+        .insert(dbData)
         .select()
         .single();
 
@@ -130,22 +147,30 @@ export class ImageManagementService {
     }
   }
 
-  // Update image data
+  // Update image data with all fields
   async updateImage(
     id: string,
     updates: Partial<ImageData>
   ): Promise<ImageData | null> {
     try {
+      const updateData: any = {
+        title: updates.title || null,
+        description: updates.description || null,
+        alt: updates.alt,
+        type: updates.type,
+        project_id: updates.project_id,
+        emoji: updates.emoji || null,
+        year: updates.year || null,
+        live_url: updates.live_url || null,
+        github_url: updates.github_url || null,
+        tech_stack: updates.tech_stack || null,
+        project_data: updates.project_data || null,
+        updated_at: new Date().toISOString(),
+      };
+
       const { data, error } = await this.supabaseService.client
         .from('images')
-        .update({
-          title: updates.title || null,
-          description: updates.description || null,
-          alt: updates.alt,
-          type: updates.type,
-          project_id: updates.project_id,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();

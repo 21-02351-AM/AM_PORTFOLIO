@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-gray-50">
-  <!-- Login Screen -->
+  <!-- Login Screen - Same as before -->
   <div
     *ngIf="!isAuthenticated"
     class="flex items-center justify-center min-h-screen"
@@ -7,7 +7,6 @@
     <div class="bg-white p-8 rounded-lg shadow-md w-96">
       <h1 class="text-2xl font-bold text-center mb-6">Admin Login</h1>
 
-      <!-- Message -->
       <div
         *ngIf="message"
         class="mb-4 p-3 rounded"
@@ -40,7 +39,7 @@
   <div *ngIf="isAuthenticated" class="p-6">
     <!-- Header -->
     <div class="flex justify-between items-center mb-8">
-      <h1 class="text-3xl font-bold">Image Management</h1>
+      <h1 class="text-3xl font-bold">Complete Content Management</h1>
       <button
         (click)="logout()"
         class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
@@ -68,7 +67,7 @@
       <span class="ml-2">Loading...</span>
     </div>
 
-    <!-- Stats with Hero Image Status -->
+    <!-- Enhanced Stats -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
       <div class="bg-white p-4 rounded-lg shadow">
         <div class="text-2xl font-bold text-blue-600">{{ images.length }}</div>
@@ -100,11 +99,12 @@
           {{ heroImageInfo }}
         </div>
       </div>
-      <div class="bg-white p-4 rounded-lg shadow">
+      <div class="bg-white p-4 rounded-lg shadow border-l-4 border-purple-500">
         <div class="text-2xl font-bold text-purple-600">
           {{ countByType("project") }}
         </div>
-        <div class="text-gray-600">Project Images</div>
+        <div class="text-gray-600">Projects</div>
+        <div class="text-xs text-purple-600 mt-1">Complete project cards</div>
       </div>
       <div class="bg-white p-4 rounded-lg shadow">
         <div class="text-2xl font-bold text-orange-600">
@@ -114,10 +114,10 @@
       </div>
     </div>
 
-    <!-- Upload Form -->
+    <!-- Enhanced Upload Form -->
     <div class="bg-white p-6 rounded-lg shadow mb-8">
       <h2 class="text-xl font-bold mb-4">
-        {{ editingImage ? "Edit Image" : "Upload New Image" }}
+        {{ editingImage ? "Edit Content" : "Add New Content" }}
       </h2>
 
       <!-- Hero Image Warning -->
@@ -144,10 +144,10 @@
         </p>
       </div>
 
-      <div class="space-y-4">
-        <!-- Type Selection First -->
+      <div class="space-y-6">
+        <!-- Type Selection -->
         <div>
-          <label class="block text-sm font-medium mb-2">Image Type *</label>
+          <label class="block text-sm font-medium mb-2">Content Type *</label>
           <select
             [(ngModel)]="uploadForm.type"
             (ngModelChange)="onTypeChange()"
@@ -157,13 +157,6 @@
               {{ type.label }}
             </option>
           </select>
-          <p
-            *ngIf="uploadForm.type === 'hero'"
-            class="text-xs text-gray-500 mt-1"
-          >
-            Hero images are used for your main profile picture. Only one is
-            allowed and no title/description needed.
-          </p>
         </div>
 
         <!-- File Input -->
@@ -202,7 +195,7 @@
           <input
             type="text"
             [(ngModel)]="uploadForm.title"
-            placeholder="Image title (optional)"
+            placeholder="Content title"
             class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -212,59 +205,209 @@
           <label class="block text-sm font-medium mb-2">Description</label>
           <textarea
             [(ngModel)]="uploadForm.description"
-            placeholder="Image description (optional)"
+            placeholder="Content description (supports HTML)"
             rows="3"
             class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
           ></textarea>
+          <p class="text-xs text-gray-500 mt-1">
+            You can use HTML tags like &lt;span class="text-blue-300
+            font-medium"&gt;highlighted text&lt;/span&gt;
+          </p>
         </div>
 
-        <!-- Project ID -->
-        <div *ngIf="uploadForm.type === 'project'">
-          <label class="block text-sm font-medium mb-2">Project ID</label>
-          <input
-            type="number"
-            [(ngModel)]="uploadForm.project_id"
-            placeholder="Optional project ID"
-            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-            min="1"
-          />
+        <!-- PROJECT-SPECIFIC FIELDS -->
+        <div *ngIf="shouldShowProjectFields" class="border-t pt-6">
+          <h3 class="text-lg font-semibold mb-4 text-purple-600">
+            Project Details
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Project ID -->
+            <div>
+              <label class="block text-sm font-medium mb-2">Project ID</label>
+              <input
+                type="number"
+                [(ngModel)]="uploadForm.project_id"
+                placeholder="Unique project ID"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                min="1"
+              />
+            </div>
+
+            <!-- Year -->
+            <div>
+              <label class="block text-sm font-medium mb-2">Year</label>
+              <input
+                type="text"
+                [(ngModel)]="uploadForm.year"
+                placeholder="Project year (e.g., 2025)"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <!-- Emoji -->
+            <div>
+              <label class="block text-sm font-medium mb-2">Emoji</label>
+              <input
+                type="text"
+                [(ngModel)]="uploadForm.emoji"
+                placeholder="🚀 (fallback if no image)"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                maxlength="4"
+              />
+            </div>
+
+            <!-- Project Status -->
+            <div>
+              <label class="block text-sm font-medium mb-2"
+                >Project Status</label
+              >
+              <select
+                [(ngModel)]="uploadForm.project_status"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="Personal Project">Personal Project</option>
+                <option value="Popular">Popular</option>
+                <option value="Featured">Featured</option>
+                <option value="Work">Work Project</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- URLs -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div>
+              <label class="block text-sm font-medium mb-2"
+                >Live Demo URL</label
+              >
+              <input
+                type="url"
+                [(ngModel)]="uploadForm.live_url"
+                placeholder="https://your-project.com"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium mb-2">GitHub URL</label>
+              <input
+                type="url"
+                [(ngModel)]="uploadForm.github_url"
+                placeholder="https://github.com/username/repo"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          <!-- Visual Theme -->
+          <div class="mt-4">
+            <label class="block text-sm font-medium mb-2">Visual Theme</label>
+            <select
+              [(ngModel)]="uploadForm.gradient_theme"
+              class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="blue">Blue Theme</option>
+              <option value="purple">Purple Theme</option>
+              <option value="cyan">Cyan Theme</option>
+              <option value="green">Green Theme</option>
+              <option value="orange">Orange Theme</option>
+            </select>
+            <p class="text-xs text-gray-500 mt-1">
+              This sets the color scheme for gradients, borders, and hover
+              effects
+            </p>
+          </div>
+
+          <!-- Tech Stack Management -->
+          <div class="mt-4">
+            <label class="block text-sm font-medium mb-2">Tech Stack</label>
+
+            <!-- Add Tech Input -->
+            <div class="flex gap-2 mb-3">
+              <input
+                type="text"
+                [(ngModel)]="newTech"
+                placeholder="Add technology (e.g., Angular, React, Python)"
+                class="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                (keyup.enter)="addTech()"
+              />
+              <button
+                type="button"
+                (click)="addTech()"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Add
+              </button>
+            </div>
+
+            <!-- Tech Stack Tags -->
+            <div class="flex flex-wrap gap-2">
+              <span
+                *ngFor="let tech of uploadForm.tech_stack; let i = index"
+                class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+              >
+                {{ tech }}
+                <button
+                  type="button"
+                  (click)="removeTech(i)"
+                  class="ml-2 text-blue-600 hover:text-blue-800"
+                >
+                  ×
+                </button>
+              </span>
+              <span
+                *ngIf="uploadForm.tech_stack.length === 0"
+                class="text-gray-500 text-sm"
+              >
+                No technologies added yet
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- Form Actions -->
-      <div class="flex space-x-4 mt-6">
-        <button
-          *ngIf="!editingImage"
-          (click)="uploadImage()"
-          [disabled]="
-            !uploadForm.file ||
-            !uploadForm.alt ||
-            isLoading ||
-            isHeroUploadDisabled
-          "
-          class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-        >
-          {{
-            uploadForm.type === "hero" ? "Upload Hero Image" : "Upload Image"
-          }}
-        </button>
+        <!-- Form Actions -->
+        <div class="flex space-x-4 mt-6">
+          <button
+            *ngIf="!editingImage"
+            (click)="uploadImage()"
+            [disabled]="
+              !uploadForm.file ||
+              !uploadForm.alt ||
+              isLoading ||
+              isHeroUploadDisabled
+            "
+            class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            {{
+              uploadForm.type === "hero"
+                ? "Upload Hero Image"
+                : uploadForm.type === "project"
+                ? "Create Project"
+                : "Upload Content"
+            }}
+          </button>
 
-        <button
-          *ngIf="editingImage"
-          (click)="updateImage()"
-          [disabled]="!uploadForm.alt || isLoading"
-          class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-        >
-          Update Image
-        </button>
+          <button
+            *ngIf="editingImage"
+            (click)="updateImage()"
+            [disabled]="!uploadForm.alt || isLoading"
+            class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            {{
+              uploadForm.type === "project"
+                ? "Update Project"
+                : "Update Content"
+            }}
+          </button>
 
-        <button
-          *ngIf="editingImage"
-          (click)="cancelEdit()"
-          class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700"
-        >
-          Cancel
-        </button>
+          <button
+            *ngIf="editingImage"
+            (click)="cancelEdit()"
+            class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
 
@@ -290,10 +433,10 @@
       </div>
     </div>
 
-    <!-- Images Grid -->
+    <!-- Enhanced Content Grid -->
     <div class="bg-white p-6 rounded-lg shadow">
       <h3 class="text-xl font-bold mb-4">
-        Images ({{ filteredImages.length }})
+        Content Library ({{ filteredImages.length }})
       </h3>
 
       <!-- Empty State -->
@@ -314,17 +457,17 @@
             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
           />
         </svg>
-        <p class="text-lg mb-2">No images found</p>
+        <p class="text-lg mb-2">No content found</p>
         <p class="text-sm">
           {{
             selectedType === "all"
-              ? "Upload some images to get started"
-              : "No images of this type found"
+              ? "Upload some content to get started"
+              : "No content of this type found"
           }}
         </p>
       </div>
 
-      <!-- Images Grid -->
+      <!-- Content Grid -->
       <div
         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         *ngIf="filteredImages.length > 0"
@@ -332,14 +475,42 @@
         <div
           *ngFor="let image of filteredImages"
           class="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
-          [class]="image.type === 'hero' ? 'border-green-300 bg-green-50' : ''"
+          [class]="
+            image.type === 'hero'
+              ? 'border-green-300 bg-green-50'
+              : image.type === 'project'
+              ? 'border-purple-300 bg-purple-50'
+              : ''
+          "
         >
-          <!-- Hero Badge -->
-          <div
-            *ngIf="image.type === 'hero'"
-            class="bg-green-100 px-3 py-1 text-green-800 text-xs font-medium"
-          >
-            HERO IMAGE (Profile Picture)
+          <!-- Type Badge -->
+          <div class="px-3 py-1 text-xs font-medium flex justify-between">
+            <span
+              [class]="
+                image.type === 'hero'
+                  ? 'bg-green-100 text-green-800'
+                  : image.type === 'project'
+                  ? 'bg-purple-100 text-purple-800'
+                  : image.type === 'about'
+                  ? 'bg-blue-100 text-blue-800'
+                  : 'bg-gray-100 text-gray-800'
+              "
+              class="px-2 py-1 rounded-full"
+            >
+              {{
+                image.type === "hero"
+                  ? "HERO IMAGE ⭐"
+                  : image.type === "project"
+                  ? "PROJECT 🚀"
+                  : image.type.toUpperCase()
+              }}
+            </span>
+            <span
+              *ngIf="image.project_id"
+              class="bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
+            >
+              ID: {{ image.project_id }}
+            </span>
           </div>
 
           <!-- Image -->
@@ -349,46 +520,97 @@
             class="w-full h-48 object-cover"
           />
 
-          <!-- Info -->
+          <!-- Content Info -->
           <div class="p-4">
-            <!-- Title - Show for all non-hero images -->
-            <h4
-              *ngIf="image.title && image.type !== 'hero'"
-              class="font-medium text-lg mb-1"
-            >
-              {{ image.title }}
+            <!-- Title -->
+            <h4 class="font-medium text-lg mb-1 line-clamp-2">
+              {{ image.title || image.alt }}
             </h4>
 
-            <!-- Description - Show for all non-hero images -->
-            <p
-              *ngIf="image.description && image.type !== 'hero'"
-              class="text-gray-600 text-sm mb-2"
-            >
-              {{ image.description }}
-            </p>
-
-            <!-- Alt Text - Always show -->
-            <p class="font-medium mb-2">{{ image.alt }}</p>
-
-            <div class="text-sm text-gray-500 mb-3">
-              <div class="flex justify-between">
-                <span>Type:</span>
+            <!-- Project-specific info -->
+            <div *ngIf="image.type === 'project'" class="mb-3">
+              <div class="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                <span *ngIf="getImageEmoji(image)">{{
+                  getImageEmoji(image)
+                }}</span>
+                <span *ngIf="getImageYear(image)">{{
+                  getImageYear(image)
+                }}</span>
                 <span
-                  class="font-medium capitalize"
-                  [class]="image.type === 'hero' ? 'text-green-600' : ''"
+                  *ngIf="getProjectStatus(image)"
+                  class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs"
                 >
-                  {{ image.type }}{{ image.type === "hero" ? " ⭐" : "" }}
+                  {{ getProjectStatus(image) }}
                 </span>
               </div>
-              <div *ngIf="image.project_id">
-                <span>Project:</span>
-                <span class="font-medium">#{{ image.project_id }}</span>
+
+              <!-- Tech Stack Preview -->
+              <div
+                *ngIf="
+                  getImageTechStack(image) &&
+                  getImageTechStack(image).length > 0
+                "
+                class="mb-2"
+              >
+                <div class="flex flex-wrap gap-1">
+                  <span
+                    *ngFor="
+                      let tech of getImageTechStack(image).slice(0, 3);
+                      let i = index
+                    "
+                    class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
+                  >
+                    {{ typeof tech === 'string' ? tech : tech.name }}
+                  </span>
+                  <span
+                    *ngIf="getImageTechStack(image).length > 3"
+                    class="px-2 py-1 bg-gray-200 text-gray-600 rounded text-xs"
+                  >
+                    +{{ getImageTechStack(image).length - 3 }}
+                  </span>
+                </div>
               </div>
-              <div *ngIf="image.created_at" class="flex justify-between">
-                <span>Created:</span>
-                <span class="font-medium">{{
-                  image.created_at | date : "short"
-                }}</span>
+
+              <!-- URLs Preview -->
+              <div class="flex gap-2 text-xs mb-2">
+                <span
+                  *ngIf="getImageLiveUrl(image)"
+                  class="px-2 py-1 bg-green-100 text-green-700 rounded-full"
+                >
+                  🌐 Live Demo
+                </span>
+                <span
+                  *ngIf="getImageGithubUrl(image)"
+                  class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full"
+                >
+                  📚 Source Code
+                </span>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <p
+              *ngIf="image.description"
+              class="text-gray-600 text-sm mb-3 line-clamp-3"
+              [innerHTML]="image.description"
+            ></p>
+
+            <!-- Alt Text -->
+            <p
+              class="text-sm text-gray-700 mb-3 border-l-2 border-gray-300 pl-2"
+            >
+              <strong>Alt:</strong> {{ image.alt }}
+            </p>
+
+            <!-- Metadata -->
+            <div class="text-xs text-gray-500 mb-3 space-y-1">
+              <div *ngIf="image.created_at">
+                <strong>Created:</strong>
+                {{ image.created_at | date : "short" }}
+              </div>
+              <div *ngIf="image.updated_at">
+                <strong>Updated:</strong>
+                {{ image.updated_at | date : "short" }}
               </div>
             </div>
 
@@ -418,6 +640,8 @@
                 [class]="
                   image.type === 'hero'
                     ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                    : image.type === 'project'
+                    ? 'bg-orange-100 text-orange-700 hover:bg-orange-200'
                     : 'bg-red-50 text-red-600 hover:bg-red-100'
                 "
                 class="flex-1 px-3 py-2 rounded text-sm flex items-center justify-center"
@@ -435,7 +659,13 @@
                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                   />
                 </svg>
-                {{ image.type === "hero" ? "Remove Hero" : "Delete" }}
+                {{
+                  image.type === "hero"
+                    ? "Remove Hero"
+                    : image.type === "project"
+                    ? "Delete Project"
+                    : "Delete"
+                }}
               </button>
             </div>
           </div>
