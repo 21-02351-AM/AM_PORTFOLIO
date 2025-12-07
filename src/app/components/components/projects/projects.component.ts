@@ -1,4 +1,4 @@
-// projects.component.ts - FIXED VERSION
+// projects.component.ts - FIXED VERSION WITH UNIFORM CARDS AND MODAL
 import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import {
   ImageManagementService,
@@ -78,6 +78,10 @@ export class ProjectsComponent implements OnInit, OnDestroy {
 
   // Loading state
   isLoading = true;
+
+  // Modal state
+  selectedProject: Project | null = null;
+  isModalOpen = false;
 
   // Projects loaded from database
   featuredProjects: Project[] = [];
@@ -183,24 +187,22 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     this.calculateCarouselSettings();
     await this.loadProjects();
     this.startAutoSlide();
-
-    // Start polling for new projects every 5 seconds
     this.startProjectPolling();
   }
 
   ngOnDestroy() {
     this.stopAutoSlide();
     this.stopProjectPolling();
+    // Clean up body overflow style on destroy
+    document.body.style.overflow = '';
   }
 
-  // Start polling for project updates
   private startProjectPolling() {
     this.projectCheckInterval = setInterval(async () => {
-      await this.loadProjects(true); // Silent reload
-    }, 5000); // Check every 5 seconds
+      await this.loadProjects(true);
+    }, 5000);
   }
 
-  // Stop polling
   private stopProjectPolling() {
     if (this.projectCheckInterval) {
       clearInterval(this.projectCheckInterval);
@@ -208,7 +210,6 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Load all projects from database
   async loadProjects(silent: boolean = false) {
     if (!silent) {
       this.isLoading = true;
@@ -219,22 +220,16 @@ export class ProjectsComponent implements OnInit, OnDestroy {
         'project'
       );
       const newProjects = this.transformImageDataToProjects(projectImages);
-
-      // Check if projects have changed
       const projectsChanged = this.hasProjectsChanged(newProjects);
 
       if (projectsChanged) {
         this.featuredProjects = newProjects;
-
-        // Recalculate carousel settings after projects change
         this.calculateCarouselSettings();
 
-        // Reset carousel if needed
         if (this.currentIndex > this.maxIndex) {
           this.currentIndex = Math.max(0, this.maxIndex);
         }
 
-        // Restart auto-slide to ensure it works with new data
         if (this.featuredProjects.length > 0) {
           this.resetAutoSlide();
         }
@@ -250,25 +245,21 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Check if projects have changed
   private hasProjectsChanged(newProjects: Project[]): boolean {
     if (this.featuredProjects.length !== newProjects.length) {
       return true;
     }
 
-    // Check if project IDs are different
     const currentIds = this.featuredProjects.map((p) => p.id).sort();
     const newIds = newProjects.map((p) => p.id).sort();
 
     return JSON.stringify(currentIds) !== JSON.stringify(newIds);
   }
 
-  // Transform database ImageData to Project objects
   private transformImageDataToProjects(images: ImageData[]): Project[] {
     return images.map((image, index) => {
       const styleIndex = index % this.defaultStyles.gradients.length;
 
-      // Parse tech stack from database or use empty array
       let techStack: TechTag[] = [];
       if (image.tech_stack && Array.isArray(image.tech_stack)) {
         techStack = (image.tech_stack as any[]).map((tech, techIndex) => ({
@@ -279,7 +270,6 @@ export class ProjectsComponent implements OnInit, OnDestroy {
         }));
       }
 
-      // Parse project data or use defaults
       let projectData: any = {};
       try {
         projectData =
@@ -301,18 +291,13 @@ export class ProjectsComponent implements OnInit, OnDestroy {
         liveUrl: (image as any).live_url,
         githubUrl: (image as any).github_url,
         project_id: image.project_id,
-
-        // Use saved styling or defaults
         gradients:
           projectData.gradients || this.defaultStyles.gradients[styleIndex],
         borderColors:
           projectData.borderColors ||
           this.defaultStyles.borderColors[styleIndex],
-
         techStack,
-
         buttons: projectData.buttons || this.defaultStyles.buttons,
-
         stats: projectData.stats || {
           icon: 'M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z',
           label: 'Project',
@@ -407,7 +392,6 @@ export class ProjectsComponent implements OnInit, OnDestroy {
   private startAutoSlide() {
     this.stopAutoSlide();
 
-    // Only start auto-slide if we have projects and can actually slide
     if (this.featuredProjects.length > this.slidesToShow) {
       this.autoSlideInterval = setInterval(() => {
         this.nextSlide();
@@ -427,7 +411,6 @@ export class ProjectsComponent implements OnInit, OnDestroy {
   private resetAutoSlide() {
     console.log('Resetting auto-slide...');
     this.stopAutoSlide();
-    // Small delay to ensure everything is properly updated
     setTimeout(() => {
       this.startAutoSlide();
     }, 100);
@@ -495,5 +478,29 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     }
 
     setTimeout(() => this.startAutoSlide(), 3000);
+  }
+
+  // Modal methods
+  openProjectModal(project: Project) {
+    this.selectedProject = project;
+    this.isModalOpen = true;
+    this.stopAutoSlide();
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    console.log('Modal opened for project:', project.title);
+  }
+
+  closeProjectModal() {
+    this.isModalOpen = false;
+    this.selectedProject = null;
+    document.body.style.overflow = ''; // Restore scrolling
+    console.log('Modal closed');
+    setTimeout(() => this.startAutoSlide(), 500);
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscapeKey(event: KeyboardEvent) {
+    if (this.isModalOpen) {
+      this.closeProjectModal();
+    }
   }
 }
